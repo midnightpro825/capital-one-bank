@@ -1,0 +1,944 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel – Capital One</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: #0A0E1A;
+            color: #FFFFFF;
+            min-height: 100vh;
+        }
+        .navbar {
+            background: rgba(16, 20, 30, 0.95);
+            padding: 16px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .navbar .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 22px;
+            font-weight: 700;
+            color: #FFFFFF;
+            text-decoration: none;
+        }
+        .navbar .logo .icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #00E5FF, #7C3AED);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #0A0E1A;
+        }
+        .navbar .logo span { color: #00E5FF; }
+        .navbar .badge {
+            padding: 6px 16px;
+            border-radius: 50px;
+            background: rgba(0, 229, 255, 0.15);
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            color: #00E5FF;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .navbar .btn-logout {
+            padding: 8px 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.05);
+            color: #FFFFFF;
+            cursor: pointer;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .navbar .btn-logout:hover { background: rgba(255,255,255,0.1); }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            padding: 20px;
+        }
+        .stat-card .label {
+            font-size: 13px;
+            color: #94A3B8;
+            font-weight: 500;
+        }
+        .stat-card .value {
+            font-size: 24px;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+        .stat-card .icon {
+            float: right;
+            font-size: 20px;
+            opacity: 0.3;
+            color: #00E5FF;
+        }
+        
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .toolbar .search {
+            display: flex;
+            gap: 10px;
+            flex: 1;
+            max-width: 400px;
+        }
+        .toolbar .search input {
+            flex: 1;
+            padding: 10px 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.05);
+            color: #FFFFFF;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 14px;
+            outline: none;
+        }
+        .toolbar .search input:focus { border-color: #00E5FF; }
+        .toolbar .search input::placeholder { color: #94A3B8; }
+        .toolbar .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            font-family: 'Space Grotesk', sans-serif;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #00E5FF, #7C3AED);
+            color: #0A0E1A;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0, 229, 255, 0.2); }
+        .btn-success {
+            background: #00E5FF;
+            color: #0A0E1A;
+        }
+        .btn-success:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0, 229, 255, 0.2); }
+        .btn-danger {
+            background: #FF6B6B;
+            color: #0A0E1A;
+        }
+        .btn-danger:hover { transform: translateY(-2px); }
+        .btn-warning {
+            background: #FFA94D;
+            color: #0A0E1A;
+        }
+        .btn-warning:hover { transform: translateY(-2px); }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #FFFFFF;
+        }
+        .btn-outline:hover { background: rgba(255,255,255,0.05); }
+        .btn-sm { padding: 4px 10px; font-size: 12px; border-radius: 6px; }
+        .btn-block { width: 100%; justify-content: center; }
+        
+        .table-container {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 14px;
+            overflow: hidden;
+        }
+        .table-wrapper {
+            overflow-x: auto;
+            padding: 0 4px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        thead {
+            background: rgba(255,255,255,0.03);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        th {
+            text-align: left;
+            padding: 14px 16px;
+            color: #94A3B8;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            color: #E6EDF3;
+        }
+        tr:hover td { background: rgba(255,255,255,0.02); }
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-active { background: rgba(0, 229, 255, 0.15); color: #00E5FF; }
+        .status-suspended { background: rgba(255,107,107,0.15); color: #FF6B6B; }
+        .status-frozen { background: rgba(255,169,77,0.15); color: #FFA94D; }
+        .status-closed { background: rgba(148,163,184,0.15); color: #94A3B8; }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(10px);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal.show { display: flex; }
+        .modal-content {
+            background: #1A1F2E;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid rgba(255,255,255,0.08);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .modal-header h2 {
+            font-size: 22px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .modal-header h2 i { color: #00E5FF; }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: #94A3B8;
+            cursor: pointer;
+        }
+        .modal-close:hover { color: #FFFFFF; }
+        
+        .form-group { margin-bottom: 16px; }
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            font-size: 13px;
+            color: #94A3B8;
+            margin-bottom: 4px;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            background: rgba(255,255,255,0.05);
+            color: #FFFFFF;
+            font-size: 14px;
+            font-family: 'Space Grotesk', sans-serif;
+            outline: none;
+        }
+        .form-group input:focus, .form-group select:focus { border-color: #00E5FF; }
+        .form-group select option { background: #1A1F2E; color: #FFFFFF; }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 14px 24px;
+            border-radius: 12px;
+            color: #0A0E1A;
+            font-weight: 600;
+            z-index: 10000;
+            animation: slideIn 0.3s ease;
+            max-width: 400px;
+        }
+        .toast-success { background: #00E5FF; }
+        .toast-error { background: #FF6B6B; }
+        .toast-info { background: #7C3AED; color: white; }
+        .toast-warning { background: #FFA94D; }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #94A3B8;
+        }
+        .empty-state i { font-size: 48px; opacity: 0.3; margin-bottom: 12px; }
+        
+        .action-buttons {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+        .action-buttons .btn { padding: 4px 8px; font-size: 11px; }
+        
+        .selected-user {
+            background: rgba(0, 229, 255, 0.1);
+            border: 1px solid rgba(0, 229, 255, 0.2);
+        }
+        
+        @media (max-width: 1024px) {
+            .stats-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .toolbar { flex-direction: column; align-items: stretch; }
+            .toolbar .search { max-width: 100%; }
+            .navbar { padding: 12px 16px; }
+            .container { padding: 16px; }
+        }
+        @media (max-width: 480px) {
+            .stats-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <a href="/" class="logo">
+            <div class="icon"><i class="fas fa-crown"></i></div>
+            Capital<span>One</span>
+        </a>
+        <span class="badge"><i class="fas fa-shield-alt"></i> Admin Panel</span>
+        <button class="btn-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </nav>
+
+    <div class="container">
+
+        <!-- Stats -->
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <div class="label">Total Users</div>
+                <div class="value" id="totalUsers">Loading...</div>
+                <div class="icon"><i class="fas fa-users"></i></div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Active Users</div>
+                <div class="value" id="activeUsers">Loading...</div>
+                <div class="icon"><i class="fas fa-user-check"></i></div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Total Balance</div>
+                <div class="value" id="totalBalance">Loading...</div>
+                <div class="icon"><i class="fas fa-wallet"></i></div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Transactions</div>
+                <div class="value" id="totalTransactions">Loading...</div>
+                <div class="icon"><i class="fas fa-exchange-alt"></i></div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Total Wallets</div>
+                <div class="value" id="totalWallets">Loading...</div>
+                <div class="icon"><i class="fas fa-credit-card"></i></div>
+            </div>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <div class="search">
+                <input type="text" id="searchInput" placeholder="Search by name, email or phone..." oninput="filterUsers()">
+                <button class="btn btn-outline btn-sm" onclick="loadUsers()"><i class="fas fa-sync-alt"></i> Refresh</button>
+            </div>
+            <div class="actions">
+                <button class="btn btn-success" onclick="openModal('addFundsModal')">
+                    <i class="fas fa-plus-circle"></i> Add Funds
+                </button>
+                <button class="btn btn-danger" onclick="openModal('deductModal')">
+                    <i class="fas fa-minus-circle"></i> Deduct Funds
+                </button>
+                <button class="btn btn-warning" onclick="openModal('resetPasswordModal')">
+                    <i class="fas fa-key"></i> Reset Password
+                </button>
+            </div>
+        </div>
+
+        <!-- Users Table -->
+        <div class="table-container">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:40px;">#</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Balance</th>
+                            <th>Status</th>
+                            <th style="width:200px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <tr>
+                            <td colspan="7" class="empty-state">
+                                <i class="fas fa-spinner fa-spin"></i>
+                                <p>Loading users...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== ADD FUNDS MODAL ===== -->
+    <div id="addFundsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-coins"></i> Add Funds</h2>
+                <button class="modal-close" onclick="closeModal('addFundsModal')">&times;</button>
+            </div>
+            <form onsubmit="addFunds(event)">
+                <div class="form-group">
+                    <label>Select User</label>
+                    <select id="fundUserSelect" required>
+                        <option value="">-- Select User --</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Amount ($)</label>
+                    <input type="number" id="fundAmount" placeholder="0.00" min="0.01" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>Provider (Optional)</label>
+                    <select id="fundProvider">
+                        <option value="">All Wallets</option>
+                        <option value="MTN">MTN</option>
+                        <option value="Airtel">Airtel</option>
+                        <option value="Vodafone">Vodafone</option>
+                        <option value="Tigo">Tigo</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Description (Optional)</label>
+                    <input type="text" id="fundDescription" placeholder="Admin top-up">
+                </div>
+                <button type="submit" class="btn btn-success btn-block">
+                    <i class="fas fa-plus-circle"></i> Add Funds
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== DEDUCT FUNDS MODAL ===== -->
+    <div id="deductModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-minus-circle" style="color:#FF6B6B;"></i> Deduct Funds</h2>
+                <button class="modal-close" onclick="closeModal('deductModal')">&times;</button>
+            </div>
+            <form onsubmit="deductFunds(event)">
+                <div class="form-group">
+                    <label>Select User</label>
+                    <select id="deductUserSelect" required>
+                        <option value="">-- Select User --</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Amount ($)</label>
+                    <input type="number" id="deductAmount" placeholder="0.00" min="0.01" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>Provider (Optional)</label>
+                    <select id="deductProvider">
+                        <option value="">All Wallets</option>
+                        <option value="MTN">MTN</option>
+                        <option value="Airtel">Airtel</option>
+                        <option value="Vodafone">Vodafone</option>
+                        <option value="Tigo">Tigo</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Description (Optional)</label>
+                    <input type="text" id="deductDescription" placeholder="Admin deduction">
+                </div>
+                <button type="submit" class="btn btn-danger btn-block">
+                    <i class="fas fa-minus-circle"></i> Deduct Funds
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== RESET PASSWORD MODAL ===== -->
+    <div id="resetPasswordModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-key" style="color:#FFA94D;"></i> Reset Password</h2>
+                <button class="modal-close" onclick="closeModal('resetPasswordModal')">&times;</button>
+            </div>
+            <form onsubmit="resetPassword(event)">
+                <div class="form-group">
+                    <label>Select User</label>
+                    <select id="resetUserSelect" required>
+                        <option value="">-- Select User --</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>New Password</label>
+                    <input type="text" id="resetPassword" value="password123" required>
+                </div>
+                <div class="form-group">
+                    <label>Confirm Password</label>
+                    <input type="text" id="resetConfirmPassword" value="password123" required>
+                </div>
+                <button type="submit" class="btn btn-warning btn-block">
+                    <i class="fas fa-key"></i> Reset Password
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== USER DETAILS MODAL ===== -->
+    <div id="userDetailsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-user"></i> User Details</h2>
+                <button class="modal-close" onclick="closeModal('userDetailsModal')">&times;</button>
+            </div>
+            <div id="userDetailsContent">
+                <p style="color:#94A3B8;">Loading user details...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var adminToken = localStorage.getItem('adminToken');
+        var allUsers = [];
+
+        // ===== INIT =====
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!adminToken) {
+                window.location.href = '/admin-login.html';
+                return;
+            }
+            console.log('👑 Admin logged in');
+            loadStats();
+            loadUsers();
+        });
+
+        // ===== LOAD STATS =====
+        function loadStats() {
+            fetch('/api/admin/stats', {
+                headers: { 'Authorization': 'Bearer ' + adminToken }
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    document.getElementById('totalUsers').textContent = data.stats.totalUsers || 0;
+                    document.getElementById('activeUsers').textContent = data.stats.activeUsers || 0;
+                    document.getElementById('totalBalance').textContent = '$' + (data.stats.totalBalance || 0).toFixed(2);
+                    document.getElementById('totalTransactions').textContent = data.stats.totalTransactions || 0;
+                    document.getElementById('totalWallets').textContent = data.stats.totalWallets || 0;
+                }
+            })
+            .catch(function(error) {
+                console.error('Error loading stats:', error);
+            });
+        }
+
+        // ===== LOAD USERS =====
+        function loadUsers() {
+            fetch('/api/admin/users', {
+                headers: { 'Authorization': 'Bearer ' + adminToken }
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    allUsers = data.users || [];
+                    console.log('✅ Loaded ' + allUsers.length + ' users');
+                    renderUsers(allUsers);
+                    populateUserSelects(allUsers);
+                } else {
+                    showToast('Failed to load users', 'error');
+                }
+            })
+            .catch(function(error) {
+                console.error('Error loading users:', error);
+                showToast('Error loading users', 'error');
+            });
+        }
+
+        // ===== POPULATE USER SELECTS =====
+        function populateUserSelects(users) {
+            var selects = ['fundUserSelect', 'deductUserSelect', 'resetUserSelect'];
+            for (var s = 0; s < selects.length; s++) {
+                var select = document.getElementById(selects[s]);
+                select.innerHTML = '<option value="">-- Select User --</option>';
+                for (var i = 0; i < users.length; i++) {
+                    var u = users[i];
+                    var option = document.createElement('option');
+                    option.value = u.id;
+                    option.textContent = u.name + ' (' + u.email + ')';
+                    select.appendChild(option);
+                }
+            }
+        }
+
+        // ===== RENDER USERS =====
+        function renderUsers(users) {
+            var tbody = document.getElementById('usersTableBody');
+            if (!users || users.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><i class="fas fa-inbox"></i><p>No users found</p></td></tr>';
+                return;
+            }
+
+            var html = '';
+            for (var i = 0; i < users.length; i++) {
+                var u = users[i];
+                var statusClass = 'status-' + (u.status || 'active');
+                html += '<tr>' +
+                    '<td>' + (i + 1) + '</td>' +
+                    '<td><strong>' + u.name + '</strong></td>' +
+                    '<td style="color:#94A3B8;">' + u.email + '</td>' +
+                    '<td style="color:#94A3B8;">' + (u.phone || 'N/A') + '</td>' +
+                    '<td><strong>$' + (u.balance || 0).toFixed(2) + '</strong></td>' +
+                    '<td><span class="status-badge ' + statusClass + '">' + (u.status || 'active') + '</span></td>' +
+                    '<td>' +
+                        '<div class="action-buttons">' +
+                            '<button class="btn btn-success btn-sm" onclick="quickAddFunds(\'' + u.id + '\')" title="Add Funds"><i class="fas fa-plus"></i></button>' +
+                            '<button class="btn btn-danger btn-sm" onclick="quickDeductFunds(\'' + u.id + '\')" title="Deduct Funds"><i class="fas fa-minus"></i></button>' +
+                            '<button class="btn btn-warning btn-sm" onclick="quickResetPassword(\'' + u.id + '\')" title="Reset Password"><i class="fas fa-key"></i></button>' +
+                            '<button class="btn btn-outline btn-sm" onclick="viewUserDetails(\'' + u.id + '\')" title="View Details"><i class="fas fa-eye"></i></button>' +
+                        '</div>' +
+                    '</td>' +
+                    '</tr>';
+            }
+            tbody.innerHTML = html;
+        }
+
+        // ===== FILTER USERS =====
+        function filterUsers() {
+            var search = document.getElementById('searchInput').value.toLowerCase();
+            var filtered = [];
+            for (var i = 0; i < allUsers.length; i++) {
+                var u = allUsers[i];
+                if (u.name.toLowerCase().includes(search) || 
+                    u.email.toLowerCase().includes(search) || 
+                    (u.phone && u.phone.includes(search))) {
+                    filtered.push(u);
+                }
+            }
+            renderUsers(filtered);
+        }
+
+        // ===== QUICK ADD FUNDS =====
+        function quickAddFunds(userId) {
+            var user = allUsers.find(function(u) { return u.id === userId; });
+            if (!user) { showToast('User not found', 'error'); return; }
+            
+            var amount = prompt('Enter amount to add for ' + user.name + ':', '100');
+            if (amount === null) return;
+            amount = parseFloat(amount);
+            if (isNaN(amount) || amount <= 0) {
+                showToast('Invalid amount', 'error');
+                return;
+            }
+            
+            // Find the user in the select and set it
+            var select = document.getElementById('fundUserSelect');
+            select.value = userId;
+            document.getElementById('fundAmount').value = amount;
+            openModal('addFundsModal');
+        }
+
+        // ===== QUICK DEDUCT FUNDS =====
+        function quickDeductFunds(userId) {
+            var user = allUsers.find(function(u) { return u.id === userId; });
+            if (!user) { showToast('User not found', 'error'); return; }
+            
+            var amount = prompt('Enter amount to deduct from ' + user.name + ':', '50');
+            if (amount === null) return;
+            amount = parseFloat(amount);
+            if (isNaN(amount) || amount <= 0) {
+                showToast('Invalid amount', 'error');
+                return;
+            }
+            
+            var select = document.getElementById('deductUserSelect');
+            select.value = userId;
+            document.getElementById('deductAmount').value = amount;
+            openModal('deductModal');
+        }
+
+        // ===== QUICK RESET PASSWORD =====
+        function quickResetPassword(userId) {
+            var user = allUsers.find(function(u) { return u.id === userId; });
+            if (!user) { showToast('User not found', 'error'); return; }
+            
+            if (confirm('Reset password for ' + user.name + ' to "password123"?')) {
+                var select = document.getElementById('resetUserSelect');
+                select.value = userId;
+                document.getElementById('resetPassword').value = 'password123';
+                document.getElementById('resetConfirmPassword').value = 'password123';
+                openModal('resetPasswordModal');
+            }
+        }
+
+        // ===== VIEW USER DETAILS =====
+        function viewUserDetails(userId) {
+            var user = allUsers.find(function(u) { return u.id === userId; });
+            if (!user) { showToast('User not found', 'error'); return; }
+            
+            var content = document.getElementById('userDetailsContent');
+            content.innerHTML = 
+                '<div style="display:grid;gap:12px;">' +
+                    '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">' +
+                        '<span style="color:#94A3B8;">Name</span><span>' + user.name + '</span>' +
+                    '</div>' +
+                    '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">' +
+                        '<span style="color:#94A3B8;">Email</span><span>' + user.email + '</span>' +
+                    '</div>' +
+                    '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">' +
+                        '<span style="color:#94A3B8;">Phone</span><span>' + (user.phone || 'N/A') + '</span>' +
+                    '</div>' +
+                    '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">' +
+                        '<span style="color:#94A3B8;">Balance</span><span>$' + (user.balance || 0).toFixed(2) + '</span>' +
+                    '</div>' +
+                    '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">' +
+                        '<span style="color:#94A3B8;">Status</span><span>' + (user.status || 'active') + '</span>' +
+                    '</div>' +
+                    '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">' +
+                        '<span style="color:#94A3B8;">Tier</span><span>' + (user.tier || 'Bronze') + '</span>' +
+                    '</div>' +
+                    '<div style="display:flex;justify-content:space-between;padding:8px 0;">' +
+                        '<span style="color:#94A3B8;">Joined</span><span>' + (user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A') + '</span>' +
+                    '</div>' +
+                '</div>' +
+                '<div style="display:flex;gap:10px;margin-top:16px;">' +
+                    '<button class="btn btn-success btn-sm" onclick="quickAddFunds(\'' + user.id + '\')"><i class="fas fa-plus"></i> Add Funds</button>' +
+                    '<button class="btn btn-danger btn-sm" onclick="quickDeductFunds(\'' + user.id + '\')"><i class="fas fa-minus"></i> Deduct</button>' +
+                    '<button class="btn btn-warning btn-sm" onclick="quickResetPassword(\'' + user.id + '\')"><i class="fas fa-key"></i> Reset</button>' +
+                '</div>';
+            openModal('userDetailsModal');
+        }
+
+        // ===== ADD FUNDS =====
+        function addFunds(event) {
+            event.preventDefault();
+            var userId = document.getElementById('fundUserSelect').value;
+            var amount = parseFloat(document.getElementById('fundAmount').value);
+            var provider = document.getElementById('fundProvider').value;
+            var description = document.getElementById('fundDescription').value;
+
+            if (!userId || !amount || amount <= 0) {
+                showToast('Please select a user and enter a valid amount', 'error');
+                return;
+            }
+
+            fetch('/api/admin/users/add-funds', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + adminToken
+                },
+                body: JSON.stringify({ userId: userId, amount: amount, provider: provider, description: description })
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    showToast('✅ Funds added successfully!', 'success');
+                    closeModal('addFundsModal');
+                    document.getElementById('addFundsModal').querySelector('form').reset();
+                    loadStats();
+                    loadUsers();
+                } else {
+                    showToast(data.error || 'Failed to add funds', 'error');
+                }
+            })
+            .catch(function(error) {
+                showToast('Error adding funds', 'error');
+            });
+        }
+
+        // ===== DEDUCT FUNDS =====
+        function deductFunds(event) {
+            event.preventDefault();
+            var userId = document.getElementById('deductUserSelect').value;
+            var amount = parseFloat(document.getElementById('deductAmount').value);
+            var provider = document.getElementById('deductProvider').value;
+            var description = document.getElementById('deductDescription').value;
+
+            if (!userId || !amount || amount <= 0) {
+                showToast('Please select a user and enter a valid amount', 'error');
+                return;
+            }
+
+            fetch('/api/admin/users/deduct-funds', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + adminToken
+                },
+                body: JSON.stringify({ userId: userId, amount: amount, provider: provider, description: description })
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    showToast('✅ Funds deducted successfully!', 'success');
+                    closeModal('deductModal');
+                    document.getElementById('deductModal').querySelector('form').reset();
+                    loadStats();
+                    loadUsers();
+                } else {
+                    showToast(data.error || 'Failed to deduct funds', 'error');
+                }
+            })
+            .catch(function(error) {
+                showToast('Error deducting funds', 'error');
+            });
+        }
+
+        // ===== RESET PASSWORD =====
+        function resetPassword(event) {
+            event.preventDefault();
+            var userId = document.getElementById('resetUserSelect').value;
+            var password = document.getElementById('resetPassword').value;
+            var confirm = document.getElementById('resetConfirmPassword').value;
+
+            if (!userId) {
+                showToast('Please select a user', 'error');
+                return;
+            }
+            if (password !== confirm) {
+                showToast('Passwords do not match', 'error');
+                return;
+            }
+            if (password.length < 8) {
+                showToast('Password must be at least 8 characters', 'error');
+                return;
+            }
+
+            // Find user
+            var user = allUsers.find(function(u) { return u.id === userId; });
+            if (!user) {
+                showToast('User not found', 'error');
+                return;
+            }
+
+            // Call API to reset password
+            fetch('/api/admin/users/reset-password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + adminToken
+                },
+                body: JSON.stringify({ userId: userId, newPassword: password })
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    showToast('✅ Password reset for ' + user.name, 'success');
+                    closeModal('resetPasswordModal');
+                    document.getElementById('resetPasswordModal').querySelector('form').reset();
+                } else {
+                    showToast(data.error || 'Failed to reset password', 'error');
+                }
+            })
+            .catch(function(error) {
+                showToast('Error resetting password', 'error');
+            });
+        }
+
+        // ===== MODALS =====
+        function openModal(id) {
+            document.getElementById(id).classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
+
+        document.addEventListener('click', function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('show');
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        // ===== TOAST =====
+        function showToast(message, type) {
+            type = type || 'success';
+            var toast = document.createElement('div');
+            toast.className = 'toast toast-' + type;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(function() {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100px)';
+                setTimeout(function() { toast.remove(); }, 300);
+            }, 3000);
+        }
+
+        // ===== LOGOUT =====
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('adminToken');
+                window.location.href = '/admin-login.html';
+            }
+        }
+    </script>
+</body>
+</html>

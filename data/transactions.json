@@ -1,0 +1,12 @@
+[
+  {
+    "id": "7d29f79d-114b-46ae-a8be-4a03b53e07ba",
+    "userId": "34093eb3-0c65-4178-a8d8-9d4dbe8c91d2",
+    "recipientId": null,
+    "type": "Credit",
+    "amount": 100,
+    "description": "Admin credit: donation",
+    "balanceAfter": 100,
+    "date": "2026-07-04T14:36:30.485Z"
+  }
+]

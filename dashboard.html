@@ -1,0 +1,1359 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard – Capital One</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --accent: #00E5FF;
+            --accent-glow: rgba(0, 229, 255, 0.3);
+            --dark: #0A0E1A;
+            --dark-card: #111827;
+            --text-primary: #FFFFFF;
+            --text-secondary: #94A3B8;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.08);
+        }
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+        .bg-grid {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            background-image: 
+                linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 229, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+        }
+        .bg-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            pointer-events: none;
+            opacity: 0.12;
+            z-index: 0;
+            animation: orbFloat 20s ease-in-out infinite alternate;
+        }
+        .bg-orb.orb1 {
+            width: 600px; height: 600px;
+            top: -20%; right: -10%;
+            background: radial-gradient(circle, rgba(0, 229, 255, 0.15) 0%, transparent 70%);
+        }
+        .bg-orb.orb2 {
+            width: 400px; height: 400px;
+            bottom: -10%; left: -10%;
+            background: radial-gradient(circle, rgba(124, 58, 237, 0.15) 0%, transparent 70%);
+            animation-delay: -7s;
+        }
+        @keyframes orbFloat {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(40px, -40px) scale(1.1); }
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--dark); }
+        ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; }
+
+        .navbar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1000;
+            padding: 12px 24px;
+            backdrop-filter: blur(20px);
+            background: rgba(10, 14, 26, 0.85);
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .navbar .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 22px;
+            font-weight: 700;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+        .navbar .logo .icon {
+            width: 36px; height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #00E5FF, #7C3AED);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: var(--dark);
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+        .navbar .logo span {
+            background: linear-gradient(135deg, #00E5FF, #7C3AED);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .nav-user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+        .nav-user .avatar {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00E5FF, #7C3AED);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--dark);
+        }
+        .nav-user .info .name { font-weight: 600; font-size: 14px; }
+        .nav-user .info .tier { font-size: 12px; color: var(--text-secondary); }
+        .nav-user .info .tier i { color: #FFD700; }
+
+        .btn {
+            padding: 8px 18px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 13px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Space Grotesk', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        .btn-glass {
+            background: var(--glass-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--glass-border);
+        }
+        .btn-glass:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); }
+        .btn-primary {
+            background: linear-gradient(135deg, #00E5FF, #7C3AED);
+            color: var(--dark);
+            box-shadow: 0 0 30px var(--accent-glow);
+        }
+        .btn-primary:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 0 50px var(--accent-glow); }
+        .btn-danger { background: #FF6B6B; color: var(--dark); }
+        .btn-danger:hover { transform: translateY(-2px); box-shadow: 0 0 30px rgba(255,107,107,0.3); }
+        .btn-sm { padding: 6px 14px; font-size: 12px; }
+        .btn-block { width: 100%; justify-content: center; }
+
+        .dashboard {
+            padding: 85px 24px 24px;
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .welcome-banner {
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.08), rgba(124, 58, 237, 0.08));
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 28px 32px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .welcome-banner h1 { font-size: 26px; font-weight: 700; }
+        .welcome-banner h1 span {
+            background: linear-gradient(135deg, #00E5FF, #7C3AED);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .welcome-banner p { color: var(--text-secondary); margin-top: 4px; }
+        .welcome-banner .badge {
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 50px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            font-size: 13px;
+            font-weight: 500;
+            margin-top: 6px;
+        }
+        .welcome-banner .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            padding: 18px 20px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        .stat-card:hover {
+            border-color: rgba(0, 229, 255, 0.2);
+            transform: translateY(-3px);
+        }
+        .stat-card .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+        .stat-card .stat-label { font-size: 12px; color: var(--text-secondary); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-card .stat-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+        .stat-card .stat-value { font-size: 24px; font-weight: 700; }
+        .stat-card .stat-change { font-size: 11px; margin-top: 4px; display: inline-block; padding: 2px 10px; border-radius: 50px; font-weight: 600; }
+        .stat-change.positive { background: rgba(0, 229, 255, 0.15); color: #00E5FF; }
+        .stat-change.neutral { background: rgba(255,255,255,0.05); color: var(--text-secondary); }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+        .card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 22px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        .card:hover { border-color: rgba(0, 229, 255, 0.1); }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+        .card-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .card-header h3 i { color: var(--accent); }
+
+        .transaction-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--glass-border);
+            transition: all 0.2s ease;
+        }
+        .transaction-item:last-child { border-bottom: none; }
+        .transaction-item:hover {
+            background: rgba(255,255,255,0.02);
+            margin: 0 -12px;
+            padding: 10px 12px;
+            border-radius: 8px;
+        }
+        .transaction-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+        .transaction-icon {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        .transaction-info { flex: 1; }
+        .transaction-info p { font-weight: 500; font-size: 14px; margin: 0; }
+        .transaction-info small { color: var(--text-secondary); font-size: 12px; }
+        .transaction-amount { font-weight: 700; font-size: 14px; white-space: nowrap; }
+        .transaction-amount.positive { color: #00E5FF; }
+        .transaction-amount.negative { color: #FF6B6B; }
+        .transaction-status {
+            font-size: 11px;
+            padding: 2px 10px;
+            border-radius: 50px;
+            font-weight: 500;
+            margin-left: 8px;
+        }
+        .transaction-status.completed {
+            background: rgba(0, 229, 255, 0.15);
+            color: #00E5FF;
+        }
+
+        .quick-actions-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        .quick-action-btn {
+            padding: 14px;
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            background: var(--glass-bg);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+        .quick-action-btn:hover {
+            border-color: var(--accent);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .quick-action-btn i {
+            font-size: 20px;
+            display: block;
+            margin-bottom: 4px;
+            color: var(--accent);
+        }
+        .quick-action-btn span { font-size: 12px; font-weight: 500; }
+
+        .savings-item { margin-bottom: 14px; }
+        .savings-item:last-child { margin-bottom: 0; }
+        .savings-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .savings-progress {
+            height: 6px;
+            background: var(--glass-bg);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+        .savings-progress .fill {
+            height: 100%;
+            border-radius: 4px;
+            background: linear-gradient(90deg, #00E5FF, #7C3AED);
+            transition: width 0.6s ease;
+        }
+
+        .notification-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .notification-item:last-child { border-bottom: none; }
+        .notification-item .notif-icon {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+        .notification-item .notif-content { flex: 1; }
+        .notification-item .notif-content p { font-size: 13px; margin: 0; }
+        .notification-item .notif-content small { color: var(--text-secondary); font-size: 11px; }
+        .notification-item.unread .notif-content p { font-weight: 600; }
+
+        .loan-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .loan-item:last-child { border-bottom: none; }
+        .loan-info p { font-weight: 500; font-size: 14px; margin: 0; }
+        .loan-info small { color: var(--text-secondary); font-size: 12px; }
+        .loan-amount { font-weight: 700; font-size: 14px; }
+        .loan-amount.active { color: #FFA94D; }
+        .loan-amount.completed { color: #00E5FF; }
+
+        .empty-state {
+            text-align: center;
+            padding: 24px 0;
+            color: var(--text-secondary);
+        }
+        .empty-state i { font-size: 32px; margin-bottom: 8px; opacity: 0.5; }
+        .empty-state p { font-size: 14px; }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(20px);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal.show { display: flex; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .modal-content {
+            background: var(--dark-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 520px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .modal-header h2 { font-size: 22px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+        .modal-header h2 i { color: var(--accent); }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+        .modal-close:hover { color: var(--text-primary); transform: rotate(90deg); }
+
+        .form-group { margin-bottom: 16px; }
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            background: var(--glass-bg);
+            color: var(--text-primary);
+            font-size: 14px;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--accent);
+            outline: none;
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px; right: 20px;
+            padding: 14px 24px;
+            border-radius: 12px;
+            color: var(--dark);
+            font-weight: 600;
+            z-index: 10000;
+            animation: slideInRight 0.3s ease;
+            max-width: 400px;
+        }
+        .toast-success { background: #00E5FF; }
+        .toast-error { background: #FF6B6B; }
+        .toast-info { background: #7C3AED; color: white; }
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @media (max-width: 1200px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 992px) { .dashboard-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) {
+            .navbar { padding: 10px 16px; flex-wrap: wrap; gap: 10px; }
+            .dashboard { padding: 75px 16px 16px; }
+            .welcome-banner { flex-direction: column; text-align: center; padding: 20px; }
+            .welcome-banner .actions { margin-top: 12px; justify-content: center; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .nav-user .info { display: none; }
+            .quick-actions-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 480px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .quick-actions-grid { grid-template-columns: 1fr; }
+            .modal-content { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-grid"></div>
+    <div class="bg-orb orb1"></div>
+    <div class="bg-orb orb2"></div>
+
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar">
+        <a href="/" class="logo">
+            <div class="icon"><i class="fas fa-bolt"></i></div>
+            Capital<span>One</span>
+        </a>
+        <div class="nav-right">
+            <div class="nav-user">
+                <div class="info">
+                    <div class="name" id="userName">User</div>
+                    <div class="tier"><i class="fas fa-star"></i> Tier: <span id="userTier">Bronze</span></div>
+                </div>
+                <div class="avatar" id="userAvatar">U</div>
+            </div>
+            <button onclick="logout()" class="btn btn-glass btn-sm">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- ===== DASHBOARD ===== -->
+    <div class="dashboard">
+
+        <!-- Welcome Banner -->
+        <div class="welcome-banner">
+            <div>
+                <h1>Welcome back, <span id="welcomeName">User</span>! 👋</h1>
+                <p id="welcomeEmail">you@example.com</p>
+                <div class="badge" id="welcomeBadge">🏆 Bronze Member</div>
+            </div>
+            <div class="actions">
+                <button class="btn btn-primary btn-sm" onclick="openModal('sendModal')">
+                    <i class="fas fa-paper-plane"></i> Send
+                </button>
+                <button class="btn btn-glass btn-sm" onclick="openModal('airtimeModal')">
+                    <i class="fas fa-wifi"></i> Airtime
+                </button>
+                <button class="btn btn-glass btn-sm" onclick="openModal('billModal')">
+                    <i class="fas fa-file-invoice"></i> Bills
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-label">Total Balance</span>
+                    <div class="stat-icon" style="background:rgba(0,229,255,0.15);color:#00E5FF;">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                </div>
+                <div class="stat-value" id="totalBalance">.00</div>
+                <span class="stat-change positive">+12.5% this month</span>
+            </div>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-label">Mobile Money</span>
+                    <div class="stat-icon" style="background:rgba(124,58,237,0.15);color:#7C3AED;">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                </div>
+                <div class="stat-value" id="mobileBalance">.00</div>
+                <span class="stat-change positive">Active</span>
+            </div>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-label">Transactions</span>
+                    <div class="stat-icon" style="background:rgba(255,169,77,0.15);color:#FFA94D;">
+                        <i class="fas fa-exchange-alt"></i>
+                    </div>
+                </div>
+                <div class="stat-value" id="transactionCount">0</div>
+                <span class="stat-change neutral">This month</span>
+            </div>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-label">Savings</span>
+                    <div class="stat-icon" style="background:rgba(0,229,255,0.15);color:#00E5FF;">
+                        <i class="fas fa-piggy-bank"></i>
+                    </div>
+                </div>
+                <div class="stat-value" id="savingsTotal">.00</div>
+                <span class="stat-change positive">On track</span>
+            </div>
+        </div>
+
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
+
+            <!-- Left Column -->
+            <div>
+
+                <!-- Recent Transactions -->
+                <div class="card" style="margin-bottom:20px;">
+                    <div class="card-header">
+                        <h3><i class="fas fa-history"></i> Recent Transactions</h3>
+                        <button onclick="loadDashboard()" class="btn btn-glass btn-sm">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                    <div id="recentTransactions">
+                        <div class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <p>No transactions yet</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Savings Goals -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-piggy-bank"></i> Savings Goals</h3>
+                        <button onclick="openModal('savingsModal')" class="btn btn-primary btn-sm">
+                            <i class="fas fa-plus"></i> New
+                        </button>
+                    </div>
+                    <div id="savingsGoals">
+                        <div class="empty-state">
+                            <i class="fas fa-plus-circle"></i>
+                            <p>No savings goals yet</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div>
+
+                <!-- Quick Actions -->
+                <div class="card" style="margin-bottom:20px;">
+                    <div class="card-header">
+                        <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
+                    </div>
+                    <div class="quick-actions-grid">
+                        <button onclick="openModal('sendModal')" class="quick-action-btn">
+                            <i class="fas fa-paper-plane"></i>
+                            <span>Send</span>
+                        </button>
+                        <button onclick="openModal('requestModal')" class="quick-action-btn">
+                            <i class="fas fa-download"></i>
+                            <span>Request</span>
+                        </button>
+                        <button onclick="openModal('airtimeModal')" class="quick-action-btn">
+                            <i class="fas fa-wifi"></i>
+                            <span>Airtime</span>
+                        </button>
+                        <button onclick="openModal('billModal')" class="quick-action-btn">
+                            <i class="fas fa-file-invoice"></i>
+                            <span>Bills</span>
+                        </button>
+                        <button onclick="openModal('qrModal')" class="quick-action-btn">
+                            <i class="fas fa-qrcode"></i>
+                            <span>QR Pay</span>
+                        </button>
+                        <button onclick="openModal('loanModal')" class="quick-action-btn">
+                            <i class="fas fa-hand-holding-usd"></i>
+                            <span>Loan</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Notifications -->
+                <div class="card" style="margin-bottom:20px;">
+                    <div class="card-header">
+                        <h3><i class="fas fa-bell"></i> Notifications</h3>
+                        <button onclick="markAllRead()" class="btn btn-glass btn-sm">Mark All Read</button>
+                    </div>
+                    <div id="notifications">
+                        <div class="empty-state">
+                            <i class="fas fa-bell-slash"></i>
+                            <p>No notifications</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Loans -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-hand-holding-usd"></i> Active Loans</h3>
+                        <button onclick="openModal('loanModal')" class="btn btn-primary btn-sm">
+                            <i class="fas fa-plus"></i> Apply
+                        </button>
+                    </div>
+                    <div id="activeLoans">
+                        <div class="empty-state">
+                            <i class="fas fa-check-circle"></i>
+                            <p>No active loans</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODALS ===== -->
+
+    <!-- Send Modal -->
+    <div id="sendModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-paper-plane"></i> Send Money</h2>
+                <button class="modal-close" onclick="closeModal('sendModal')">&times;</button>
+            </div>
+            <form onsubmit="sendMoney(event)">
+                <div class="form-group">
+                    <label>Recipient Phone</label>
+                    <input type="tel" id="sendPhone" placeholder="+1 234 567 890" required>
+                </div>
+                <div class="form-group">
+                    <label>Amount ($)</label>
+                    <input type="number" id="sendAmount" placeholder="0.00" min="0.01" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <input type="text" id="sendDescription" placeholder="What's this for?">
+                </div>
+                <div class="form-group">
+                    <label>PIN</label>
+                    <input type="password" id="sendPin" placeholder="4-digit PIN" maxlength="4" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">
+                    <i class="fas fa-paper-plane"></i> Send
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Request Modal -->
+    <div id="requestModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-download"></i> Request Money</h2>
+                <button class="modal-close" onclick="closeModal('requestModal')">&times;</button>
+            </div>
+            <form onsubmit="requestMoney(event)">
+                <div class="form-group">
+                    <label>Payer Phone</label>
+                    <input type="tel" id="requestPhone" placeholder="+1 234 567 890" required>
+                </div>
+                <div class="form-group">
+                    <label>Amount ($)</label>
+                    <input type="number" id="requestAmount" placeholder="0.00" min="0.01" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <input type="text" id="requestDescription" placeholder="What's this for?">
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">
+                    <i class="fas fa-download"></i> Request
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Airtime Modal -->
+    <div id="airtimeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-wifi"></i> Buy Airtime</h2>
+                <button class="modal-close" onclick="closeModal('airtimeModal')">&times;</button>
+            </div>
+            <form onsubmit="buyAirtime(event)">
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" id="airtimePhone" placeholder="+1 234 567 890" required>
+                </div>
+                <div class="form-group">
+                    <label>Network</label>
+                    <select id="airtimeNetwork" required>
+                        <option value="MTN">MTN</option>
+                        <option value="Airtel">Airtel</option>
+                        <option value="Vodafone">Vodafone</option>
+                        <option value="Tigo">Tigo</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Amount ($)</label>
+                    <input type="number" id="airtimeAmount" placeholder="0.00" min="0.01" step="0.01" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">
+                    <i class="fas fa-wifi"></i> Buy
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bill Modal -->
+    <div id="billModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-file-invoice"></i> Pay Bill</h2>
+                <button class="modal-close" onclick="closeModal('billModal')">&times;</button>
+            </div>
+            <form onsubmit="payBill(event)">
+                <div class="form-group">
+                    <label>Bill Type</label>
+                    <select id="billType" required>
+                        <option value="Electricity">Electricity</option>
+                        <option value="Water">Water</option>
+                        <option value="Internet">Internet</option>
+                        <option value="TV">TV</option>
+                        <option value="Education">Education</option>
+                        <option value="Rent">Rent</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Account Number</label>
+                    <input type="text" id="billAccount" placeholder="Enter account number" required>
+                </div>
+                <div class="form-group">
+                    <label>Amount ($)</label>
+                    <input type="number" id="billAmount" placeholder="0.00" min="0.01" step="0.01" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">
+                    <i class="fas fa-file-invoice"></i> Pay
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- QR Modal -->
+    <div id="qrModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-qrcode"></i> QR Payment</h2>
+                <button class="modal-close" onclick="closeModal('qrModal')">&times;</button>
+            </div>
+            <div style="text-align:center;padding:10px 0;">
+                <button onclick="generateQR()" class="btn btn-primary" style="margin-bottom:16px;">
+                    <i class="fas fa-plus"></i> Generate QR
+                </button>
+                <div id="qrDisplay" style="display:none;">
+                    <div style="background:var(--glass-bg);padding:24px;border-radius:12px;margin:10px 0;border:1px solid var(--glass-border);">
+                        <div style="font-size:32px;font-weight:700;letter-spacing:4px;color:var(--accent);" id="qrCodeDisplay">QR-ABCD1234</div>
+                        <p style="margin-top:8px;color:var(--text-secondary);font-size:13px;">Scan to pay</p>
+                        <button onclick="copyQR()" class="btn btn-glass btn-sm"><i class="fas fa-copy"></i> Copy</button>
+                    </div>
+                </div>
+                <hr style="border-color:var(--glass-border);margin:16px 0;">
+                <h4 style="margin-bottom:10px;">Scan QR to Pay</h4>
+                <form onsubmit="scanQR(event)">
+                    <div class="form-group">
+                        <label>QR Code</label>
+                        <input type="text" id="qrCodeInput" placeholder="QR-ABCD1234" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Amount ($)</label>
+                        <input type="number" id="qrAmount" placeholder="0.00" min="0.01" step="0.01" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">
+                        <i class="fas fa-qrcode"></i> Scan & Pay
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Savings Modal -->
+    <div id="savingsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-piggy-bank"></i> Create Savings Goal</h2>
+                <button class="modal-close" onclick="closeModal('savingsModal')">&times;</button>
+            </div>
+            <form onsubmit="createSavings(event)">
+                <div class="form-group">
+                    <label>Goal Name</label>
+                    <input type="text" id="savingsGoal" placeholder="e.g. Vacation Fund" required>
+                </div>
+                <div class="form-group">
+                    <label>Target Amount ($)</label>
+                    <input type="number" id="savingsTarget" placeholder="0.00" min="0.01" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>Deadline</label>
+                    <input type="date" id="savingsDeadline">
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">
+                    <i class="fas fa-plus"></i> Create
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Loan Modal -->
+    <div id="loanModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-hand-holding-usd"></i> Apply for Loan</h2>
+                <button class="modal-close" onclick="closeModal('loanModal')">&times;</button>
+            </div>
+            <form onsubmit="applyLoan(event)">
+                <div class="form-group">
+                    <label>Loan Amount ($)</label>
+                    <input type="number" id="loanAmount" placeholder="0.00" min="100" step="100" required>
+                </div>
+                <div class="form-group">
+                    <label>Purpose</label>
+                    <input type="text" id="loanPurpose" placeholder="What's this for?" required>
+                </div>
+                <div class="form-group">
+                    <label>Duration (Months)</label>
+                    <select id="loanDuration" required>
+                        <option value="3">3 months</option>
+                        <option value="6">6 months</option>
+                        <option value="12" selected>12 months</option>
+                        <option value="24">24 months</option>
+                        <option value="36">36 months</option>
+                    </select>
+                </div>
+                <div style="background:var(--glass-bg);padding:12px;border-radius:10px;margin-bottom:16px;border:1px solid var(--glass-border);">
+                    <p style="font-size:13px;color:var(--text-secondary);">Interest Rate: 10% APR</p>
+                    <p style="font-size:13px;color:var(--accent);" id="loanEstimate">Monthly: .00</p>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">
+                    <i class="fas fa-hand-holding-usd"></i> Apply
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // ===== STATE =====
+        var currentUser = null;
+        var currentUserId = null;
+
+        // ===== INIT =====
+        document.addEventListener('DOMContentLoaded', function() {
+            var token = localStorage.getItem('token');
+            var userData = localStorage.getItem('user');
+            if (!token) {
+                window.location.href = '/login.html';
+                return;
+            }
+            if (userData) {
+                currentUser = JSON.parse(userData);
+                currentUserId = currentUser.id;
+                updateUserUI(currentUser);
+                loadDashboard();
+            }
+        });
+
+        // ===== UPDATE UI =====
+        function updateUserUI(user) {
+            var name = user.name || 'User';
+            var initial = name.charAt(0).toUpperCase();
+            var userNameEl = document.getElementById('userName');
+            var welcomeNameEl = document.getElementById('welcomeName');
+            var avatarEl = document.getElementById('userAvatar');
+            var emailEl = document.getElementById('welcomeEmail');
+            var tierEl = document.getElementById('userTier');
+            var badgeEl = document.getElementById('welcomeBadge');
+
+            if (userNameEl) userNameEl.textContent = name;
+            if (welcomeNameEl) welcomeNameEl.textContent = name;
+            if (avatarEl) avatarEl.textContent = initial;
+            if (emailEl) emailEl.textContent = user.email || 'you@example.com';
+            
+            var tier = user.tier || 'Bronze';
+            if (tierEl) tierEl.textContent = tier;
+            if (badgeEl) badgeEl.textContent = '🏆 ' + tier + ' Member';
+        }
+
+        // ===== LOAD DASHBOARD =====
+        function loadDashboard() {
+            var token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/login.html';
+                return;
+            }
+
+            fetch('/api/dashboard/' + currentUserId, {
+                headers: { 'Authorization': 'Bearer ' + token }
+            })
+            .then(function(response) {
+                if (!response.ok) {
+                    throw new Error('Failed to load dashboard');
+                }
+                return response.json();
+            })
+            .then(function(data) {
+                console.log('Dashboard data:', data);
+                if (data.success) {
+                    // Update stats
+                    var totalBalanceEl = document.getElementById('totalBalance');
+                    var mobileBalanceEl = document.getElementById('mobileBalance');
+                    var transactionCountEl = document.getElementById('transactionCount');
+                    var savingsTotalEl = document.getElementById('savingsTotal');
+
+                    if (totalBalanceEl) totalBalanceEl.textContent = '$' + (data.stats.totalBalance || 0).toFixed(2);
+                    if (mobileBalanceEl) mobileBalanceEl.textContent = '$' + (data.stats.mobileBalance || 0).toFixed(2);
+                    if (transactionCountEl) transactionCountEl.textContent = data.stats.totalTransactions || 0;
+                    if (savingsTotalEl) savingsTotalEl.textContent = '$' + (data.stats.savingsTotal || 0).toFixed(2);
+
+                    // Render transactions
+                    renderTransactions(data.transactions || []);
+                    // Render savings
+                    renderSavings(data.savings || []);
+                    // Render notifications
+                    renderNotifications(data.notifications || []);
+                    // Render loans
+                    renderLoans(data.loans || []);
+
+                    // Update user data
+                    if (data.user) {
+                        currentUser = data.user;
+                        updateUserUI(data.user);
+                    }
+                }
+            })
+            .catch(function(error) {
+                console.error('Error loading dashboard:', error);
+                showToast('Error loading dashboard', 'error');
+            });
+        }
+
+        // ===== RENDER TRANSACTIONS =====
+        function renderTransactions(transactions) {
+            var container = document.getElementById('recentTransactions');
+            if (!container) return;
+            
+            if (!transactions || transactions.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><p>No transactions yet</p></div>';
+                return;
+            }
+
+            var html = '';
+            var recent = transactions.slice(0, 5);
+            for (var i = 0; i < recent.length; i++) {
+                var t = recent[i];
+                var isPositive = t.type === 'received' || t.type === 'deposit';
+                var icon = isPositive ? 'arrow-down' : 'arrow-up';
+                var iconColor = isPositive ? '#00E5FF' : '#FF6B6B';
+                var bgColor = isPositive ? 'rgba(0,229,255,0.15)' : 'rgba(255,107,107,0.15)';
+                var amountClass = isPositive ? 'positive' : 'negative';
+                var amount = (isPositive ? '+' : '-') + '$' + (t.amount || 0).toFixed(2);
+                var statusClass = t.status || 'completed';
+                var statusLabel = statusClass.charAt(0).toUpperCase() + statusClass.slice(1);
+
+                html += '<div class="transaction-item">' +
+                    '<div class="transaction-left">' +
+                        '<div class="transaction-icon" style="background:' + bgColor + ';color:' + iconColor + ';">' +
+                            '<i class="fas fa-' + icon + '"></i>' +
+                        '</div>' +
+                        '<div class="transaction-info">' +
+                            '<p>' + (t.description || t.type || 'Transaction') + '</p>' +
+                            '<small>' + new Date(t.timestamp).toLocaleString() + '</small>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div>' +
+                        '<div class="transaction-amount ' + amountClass + '">' + amount + '</div>' +
+                        '<span class="transaction-status ' + statusClass + '">' + statusLabel + '</span>' +
+                    '</div>' +
+                '</div>';
+            }
+            container.innerHTML = html;
+        }
+
+        // ===== RENDER SAVINGS =====
+        function renderSavings(savings) {
+            var container = document.getElementById('savingsGoals');
+            if (!container) return;
+            
+            if (!savings || savings.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-plus-circle"></i><p>No savings goals yet</p></div>';
+                return;
+            }
+
+            var html = '';
+            for (var i = 0; i < savings.length; i++) {
+                var s = savings[i];
+                var progress = Math.min((s.currentAmount / s.targetAmount) * 100, 100);
+                var isCompleted = s.status === 'completed';
+
+                html += '<div class="savings-item">' +
+                    '<div class="savings-header">' +
+                        '<span>' + s.goal + '</span>' +
+                        '<span>$' + s.currentAmount.toFixed(2) + ' / $' + s.targetAmount.toFixed(2) + '</span>' +
+                    '</div>' +
+                    '<div class="savings-progress">' +
+                        '<div class="fill" style="width:' + progress + '%;"></div>' +
+                    '</div>' +
+                    '<div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-secondary);margin-top:4px;">' +
+                        '<span>' + (isCompleted ? '✅ Completed!' : progress.toFixed(0) + '%') + '</span>' +
+                        (!isCompleted ? '<button onclick="depositToSavings(\'' + s.id + '\')" class="btn btn-primary btn-sm">Add</button>' : '') +
+                    '</div>' +
+                '</div>';
+            }
+            container.innerHTML = html;
+        }
+
+        // ===== RENDER NOTIFICATIONS =====
+        function renderNotifications(notifications) {
+            var container = document.getElementById('notifications');
+            if (!container) return;
+            
+            if (!notifications || notifications.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-bell-slash"></i><p>No notifications</p></div>';
+                return;
+            }
+
+            var html = '';
+            var display = notifications.slice(0, 5);
+            for (var i = 0; i < display.length; i++) {
+                var n = display[i];
+                var iconMap = {
+                    'transaction': { icon: 'fa-exchange-alt', color: '#00E5FF', bg: 'rgba(0,229,255,0.15)' },
+                    'request': { icon: 'fa-hand-holding-usd', color: '#FFA94D', bg: 'rgba(255,169,77,0.15)' },
+                    'loan': { icon: 'fa-hand-holding-usd', color: '#7C3AED', bg: 'rgba(124,58,237,0.15)' },
+                    'achievement': { icon: 'fa-trophy', color: '#FFD700', bg: 'rgba(255,215,0,0.15)' },
+                    'system': { icon: 'fa-info-circle', color: '#00E5FF', bg: 'rgba(0,229,255,0.15)' }
+                };
+                var typeInfo = iconMap[n.type] || iconMap['system'];
+
+                html += '<div class="notification-item ' + (!n.read ? 'unread' : '') + '">' +
+                    '<div class="notif-icon" style="background:' + typeInfo.bg + ';color:' + typeInfo.color + ';">' +
+                        '<i class="fas ' + typeInfo.icon + '"></i>' +
+                    '</div>' +
+                    '<div class="notif-content">' +
+                        '<p>' + n.message + '</p>' +
+                        '<small>' + new Date(n.createdAt).toLocaleString() + '</small>' +
+                    '</div>' +
+                    (!n.read ? '<span style="width:6px;height:6px;border-radius:50%;background:#00E5FF;flex-shrink:0;"></span>' : '') +
+                '</div>';
+            }
+            container.innerHTML = html;
+        }
+
+        // ===== RENDER LOANS =====
+        function renderLoans(loans) {
+            var container = document.getElementById('activeLoans');
+            if (!container) return;
+            
+            if (!loans || loans.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-check-circle"></i><p>No active loans</p></div>';
+                return;
+            }
+
+            var html = '';
+            for (var i = 0; i < loans.length; i++) {
+                var l = loans[i];
+                var remaining = l.remainingBalance || l.totalRepayment || 0;
+
+                html += '<div class="loan-item">' +
+                    '<div class="loan-info">' +
+                        '<p>' + (l.purpose || 'Personal Loan') + '</p>' +
+                        '<small>' + l.duration + ' months • ' + (l.status === 'active' ? 'Active' : 'Completed') + '</small>' +
+                    '</div>' +
+                    '<div style="text-align:right;">' +
+                        '<div class="loan-amount ' + (l.status === 'active' ? 'active' : 'completed') + '">$' + remaining.toFixed(2) + '</div>' +
+                        '<small style="color:var(--text-secondary);font-size:11px;">Balance</small>' +
+                        (l.status === 'active' ? '<button onclick="repayLoan(\'' + l.id + '\')" class="btn btn-primary btn-sm" style="margin-top:4px;display:block;">Repay</button>' : '<span style="color:#00E5FF;font-size:12px;">✅ Paid</span>') +
+                    '</div>' +
+                '</div>';
+            }
+            container.innerHTML = html;
+        }
+
+        // ===== SEND MONEY =====
+        function sendMoney(event) {
+            event.preventDefault();
+            showToast('Send money feature coming soon!', 'info');
+            closeModal('sendModal');
+        }
+
+        function requestMoney(event) {
+            event.preventDefault();
+            showToast('Request money feature coming soon!', 'info');
+            closeModal('requestModal');
+        }
+
+        function buyAirtime(event) {
+            event.preventDefault();
+            showToast('Airtime purchase feature coming soon!', 'info');
+            closeModal('airtimeModal');
+        }
+
+        function payBill(event) {
+            event.preventDefault();
+            showToast('Bill payment feature coming soon!', 'info');
+            closeModal('billModal');
+        }
+
+        // ===== GENERATE QR =====
+        function generateQR() {
+            var code = 'QR-' + Math.random().toString(36).substr(2, 8).toUpperCase();
+            document.getElementById('qrCodeDisplay').textContent = code;
+            document.getElementById('qrDisplay').style.display = 'block';
+            showToast('QR Code generated!', 'success');
+        }
+
+        function copyQR() {
+            var code = document.getElementById('qrCodeDisplay').textContent;
+            navigator.clipboard.writeText(code).then(function() {
+                showToast('QR Code copied!', 'success');
+            }).catch(function() {
+                var textArea = document.createElement('textarea');
+                textArea.value = code;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showToast('QR Code copied!', 'success');
+            });
+        }
+
+        function scanQR(event) {
+            event.preventDefault();
+            showToast('QR scan feature coming soon!', 'info');
+            closeModal('qrModal');
+        }
+
+        // ===== SAVINGS =====
+        function createSavings(event) {
+            event.preventDefault();
+            showToast('Savings goal created!', 'success');
+            closeModal('savingsModal');
+        }
+
+        function depositToSavings(savingsId) {
+            var amount = prompt('Enter amount to deposit:');
+            if (!amount) return;
+            var depositAmount = parseFloat(amount);
+            if (depositAmount <= 0) {
+                showToast('Amount must be greater than 0', 'error');
+                return;
+            }
+            showToast('Deposit successful!', 'success');
+        }
+
+        // ===== LOANS =====
+        function applyLoan(event) {
+            event.preventDefault();
+            showToast('Loan application submitted!', 'success');
+            closeModal('loanModal');
+        }
+
+        function repayLoan(loanId) {
+            var amount = prompt('Enter repayment amount:');
+            if (!amount) return;
+            var repayAmount = parseFloat(amount);
+            if (repayAmount <= 0) {
+                showToast('Amount must be greater than 0', 'error');
+                return;
+            }
+            showToast('Loan repayment successful!', 'success');
+        }
+
+        // ===== NOTIFICATIONS =====
+        function markAllRead() {
+            showToast('All notifications marked as read', 'success');
+        }
+
+        // ===== MODALS =====
+        function openModal(id) {
+            var modal = document.getElementById(id);
+            if (modal) {
+                modal.classList.add('show');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeModal(id) {
+            var modal = document.getElementById(id);
+            if (modal) {
+                modal.classList.remove('show');
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        document.addEventListener('click', function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('show');
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        // ===== TOAST =====
+        function showToast(message, type) {
+            type = type || 'success';
+            var toast = document.createElement('div');
+            toast.className = 'toast toast-' + type;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(function() {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100px)';
+                setTimeout(function() { toast.remove(); }, 300);
+            }, 3000);
+        }
+
+        // ===== LOGOUT =====
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                window.location.href = '/login.html';
+            }
+        }
+
+        // ===== LOAN ESTIMATE =====
+        document.addEventListener('DOMContentLoaded', function() {
+            var loanAmount = document.getElementById('loanAmount');
+            var loanDuration = document.getElementById('loanDuration');
+            var loanEstimate = document.getElementById('loanEstimate');
+            if (loanAmount && loanDuration) {
+                function updateLoanEstimate() {
+                    var amount = parseFloat(loanAmount.value) || 0;
+                    var duration = parseInt(loanDuration.value) || 12;
+                    var interest = amount * 0.10;
+                    var total = amount + interest;
+                    var monthly = total / duration;
+                    if (loanEstimate) loanEstimate.textContent = 'Monthly: $' + monthly.toFixed(2);
+                }
+                loanAmount.addEventListener('input', updateLoanEstimate);
+                loanDuration.addEventListener('change', updateLoanEstimate);
+            }
+        });
+
+        // Expose functions
+        window.loadDashboard = loadDashboard;
+        window.sendMoney = sendMoney;
+        window.requestMoney = requestMoney;
+        window.buyAirtime = buyAirtime;
+        window.payBill = payBill;
+        window.generateQR = generateQR;
+        window.scanQR = scanQR;
+        window.copyQR = copyQR;
+        window.createSavings = createSavings;
+        window.depositToSavings = depositToSavings;
+        window.applyLoan = applyLoan;
+        window.repayLoan = repayLoan;
+        window.openModal = openModal;
+        window.closeModal = closeModal;
+        window.showToast = showToast;
+        window.logout = logout;
+        window.markAllRead = markAllRead;
+    </script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+{
+  "id": "admin",
+  "name": "Admin User",
+  "email": "admin@dollarbank.com",
+  "password": "$2b$10$C7MwbsjtebFMSROGJnk9j.jlUKXuZb6Nm4EO2t.MYU8Pm9jzC0lFu",
+  "balance": 299999900
+}

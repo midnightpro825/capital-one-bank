@@ -1,0 +1,18 @@
+﻿services:
+  - type: web
+    name: capital-one-bank
+    env: node
+    buildCommand: npm install
+    startCommand: node server.js
+    plan: free
+    envVars:
+      - key: NODE_VERSION
+        value: 18.17.0
+      - key: PORT
+        value: 3000
+    healthCheckPath: /api/test
+    autoDeploy: true
+    disk:
+      name: database
+      mountPath: /data
+      sizeGB: 1

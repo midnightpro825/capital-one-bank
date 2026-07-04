@@ -1,0 +1,217 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login – Capital One</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: #0A0E1A;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .login-container {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.6);
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .logo .icon {
+            width: 56px; height: 56px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #00E5FF, #7C3AED);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: #0A0E1A;
+            margin: 0 auto 12px;
+        }
+        .logo h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #FFFFFF;
+        }
+        .logo h1 span { color: #00E5FF; }
+        .logo p {
+            color: #94A3B8;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+        .badge {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .badge span {
+            display: inline-block;
+            padding: 4px 16px;
+            border-radius: 50px;
+            background: rgba(0, 229, 255, 0.15);
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            color: #00E5FF;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .form-group { margin-bottom: 16px; }
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            font-size: 13px;
+            color: #94A3B8;
+            margin-bottom: 4px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.05);
+            color: #FFFFFF;
+            font-size: 15px;
+            font-family: 'Space Grotesk', sans-serif;
+            outline: none;
+        }
+        .form-group input:focus {
+            border-color: #00E5FF;
+        }
+        .form-group input::placeholder { color: #94A3B8; }
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            font-family: 'Space Grotesk', sans-serif;
+            background: linear-gradient(135deg, #00E5FF, #7C3AED);
+            color: #0A0E1A;
+            transition: all 0.3s ease;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 229, 255, 0.2);
+        }
+        .btn:disabled { opacity: 0.7; cursor: not-allowed; }
+        .alert {
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            display: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .alert.show { display: block; }
+        .alert-error { background: rgba(255,107,107,0.15); color: #FF6B6B; border: 1px solid rgba(255,107,107,0.3); }
+        .alert-success { background: rgba(0,229,255,0.15); color: #00E5FF; border: 1px solid rgba(0,229,255,0.3); }
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 16px;
+            color: #94A3B8;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+        .back-link:hover { color: #00E5FF; }
+        @media (max-width: 480px) {
+            .login-container { padding: 24px 20px; }
+            .logo h1 { font-size: 24px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <div class="icon"><i class="fas fa-crown"></i></div>
+            <h1>Capital<span>One</span></h1>
+            <p>Admin Dashboard</p>
+        </div>
+        <div class="badge">
+            <span><i class="fas fa-shield-alt"></i> Secure Admin Access</span>
+        </div>
+
+        <div id="loginAlert" class="alert"></div>
+
+        <form onsubmit="handleAdminLogin(event)">
+            <div class="form-group">
+                <label>Admin Email</label>
+                <input type="email" id="adminEmail" placeholder="admin@capitalone.com" value="admin@capitalone.com">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="adminPassword" placeholder="Enter admin password" value="Admin@2026">
+            </div>
+            <button type="submit" class="btn" id="loginBtn">
+                <i class="fas fa-sign-in-alt"></i> Login as Admin
+            </button>
+        </form>
+
+        <a href="/login.html" class="back-link">
+            <i class="fas fa-arrow-left"></i> Back to User Login
+        </a>
+    </div>
+
+    <script>
+        async function handleAdminLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('adminEmail').value;
+            const password = document.getElementById('adminPassword').value;
+            const btn = document.getElementById('loginBtn');
+            const alertEl = document.getElementById('loginAlert');
+
+            if (!email || !password) {
+                showAlert('Please fill in all fields', 'error');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+
+            try {
+                const response = await fetch('/api/admin/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Invalid credentials');
+                localStorage.setItem('adminToken', data.token);
+                showAlert('Login successful! Redirecting...', 'success');
+                setTimeout(() => window.location.href = '/admin-dashboard.html', 1000);
+            } catch (error) {
+                showAlert(error.message || 'Login failed', 'error');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login as Admin';
+            }
+        }
+
+        function showAlert(message, type) {
+            const alertEl = document.getElementById('loginAlert');
+            alertEl.textContent = message;
+            alertEl.className = 'alert alert-' + type + ' show';
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            if (localStorage.getItem('adminToken')) {
+                window.location.href = '/admin-dashboard.html';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Money - WealthWise Bank</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/mobile-money.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-left">
+                <div class="logo">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Wealth<span>Wise</span></span>
+                </div>
+            </div>
+            <div class="nav-right">
+                <ul class="nav-links">
+                    <li><a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li><a href="mobile-money.html" class="active"><i class="fas fa-mobile-alt"></i> Mobile Money</a></li>
+                    <li><a href="transactions.html"><i class="fas fa-history"></i> Transactions</a></li>
+                    <li><a href="profile.html"><i class="fas fa-user"></i> Profile</a></li>
+                </ul>
+                <div class="nav-actions">
+                    <button onclick="logout()" class="btn btn-outline">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Money Section -->
+    <section class="mobile-money-section">
+        <div class="container">
+            <div class="page-header">
+                <div>
+                    <h1><i class="fas fa-mobile-alt" style="color: var(--primary);"></i> Mobile Money</h1>
+                    <p>Send, receive, and manage your mobile money</p>
+                </div>
+                <div class="header-actions">
+                    <button onclick="showModal('sendModal')" class="btn btn-primary">
+                        <i class="fas fa-paper-plane"></i> Send Money
+                    </button>
+                    <button onclick="showModal('airtimeModal')" class="btn btn-secondary">
+                        <i class="fas fa-wifi"></i> Buy Airtime
+                    </button>
+                </div>
+            </div>
+
+            <!-- Wallet Balance -->
+            <div class="wallet-card">
+                <div class="wallet-header">
+                    <div>
+                        <span class="wallet-label">Mobile Money Wallet</span>
+                        <h2 class="wallet-balance" id="walletBalance">$0.00</h2>
+                    </div>
+                    <div class="wallet-actions">
+                        <button onclick="showModal('sendModal')" class="btn-icon" title="Send Money">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                        <button onclick="showModal('receiveModal')" class="btn-icon" title="Request Money">
+                            <i class="fas fa-download"></i>
+                        </button>
+                        <button onclick="showModal('airtimeModal')" class="btn-icon" title="Buy Airtime">
+                            <i class="fas fa-wifi"></i>
+                        </button>
+                        <button onclick="showModal('billModal')" class="btn-icon" title="Pay Bill">
+                            <i class="fas fa-file-invoice"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="wallet-details">
+                    <div class="wallet-info">
+                        <span>Phone Number</span>
+                        <strong id="walletPhone">+1 234 567 890</strong>
+                    </div>
+                    <div class="wallet-info">
+                        <span>Provider</span>
+                        <strong id="walletProvider">MTN</strong>
+                    </div>
+                    <div class="wallet-info">
+                        <span>Status</span>
+                        <strong class="status-active">Active</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <div class="action-card" onclick="showModal('sendModal')">
+                    <div class="action-icon" style="background: #e8f5e9; color: #2e7d32;">
+                        <i class="fas fa-paper-plane"></i>
+                    </div>
+                    <span>Send Money</span>
+                </div>
+                <div class="action-card" onclick="showModal('receiveModal')">
+                    <div class="action-icon" style="background: #e3f2fd; color: #1565c0;">
+                        <i class="fas fa-download"></i>
+                    </div>
+                    <span>Request Money</span>
+                </div>
+                <div class="action-card" onclick="showModal('airtimeModal')">
+                    <div class="action-icon" style="background: #fff3e0; color: #e65100;">
+                        <i class="fas fa-wifi"></i>
+                    </div>
+                    <span>Buy Airtime</span>
+                </div>
+                <div class="action-card" onclick="showModal('billModal')">
+                    <div class="action-icon" style="background: #fce4ec; color: #c62828;">
+                        <i class="fas fa-file-invoice"></i>
+                    </div>
+                    <span>Pay Bills</span>
+                </div>
+                <div class="action-card" onclick="showModal('savingsModal')">
+                    <div class="action-icon" style="background: #f3e5f5; color: #6a1b9a;">
+                        <i class="fas fa-piggy-bank"></i>
+                    </div>
+                    <span>Savings</span>
+                </div>
+                <div class="action-card" onclick="window.location.href='transactions.html'">
+                    <div class="action-icon" style="background: #e0f7fa; color: #00695c;">
+                        <i class="fas fa-history"></i>
+                    </div>
+                    <span>History</span>
+                </div>
+            </div>
+
+            <!-- Recent Transactions -->
+            <div class="recent-transactions">
+                <div class="section-header-inline">
+                    <h3>Recent Transactions</h3>
+                    <a href="transactions.html" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <div class="transactions-list" id="transactionList">
+                    <!-- Transactions will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== MODALS ===== -->
+    <!-- Send Money Modal -->
+    <div id="sendModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-paper-plane" style="color: var(--primary);"></i> Send Money</h2>
+                <button class="modal-close" onclick="closeModal('sendModal')">&times;</button>
+            </div>
+            <form id="sendForm" onsubmit="sendMoney(event)">
+                <div class="form-group">
+                    <label>Recipient Phone Number</label>
+                    <input type="tel" id="receiverPhone" placeholder="+1 234 567 890" required>
+                </div>
+                <div class="form-group">
+                    <label>Amount ($)</label>
+                    <input type="number" id="sendAmount" placeholder="0.00" min="0.01" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>Description (Optional)</label>
+                    <input type="text" id="sendDescription" placeholder="What's this for?">
+                </div>
+                <div class="form-group">
+                    <label>PIN</label>
+                    <input type="password" id="sendPin" placeholder="Enter your 4-digit PIN" maxlength="4" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    <i class="fas fa-paper-plane"></i> Send Money
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Airtime Modal -->
+    <div id="airtimeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-wifi" style="color: var(--accent);"></i> Buy Airtime</h2>
+                <button class="modal-close" onclick="closeModal('airtimeModal')">&times;</button>
+            </div>
+            <form id="airtimeForm" onsubmit="buyAirtime(event)">
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" id="airtimePhone" placeholder="+1 234 567 890" required>
+                </div>
+                <div class="form-group">
+                    <label>Network Provider</label>
+                    <select id="airtimeNetwork" required>
+                        <option value="MTN">MTN</option>
+                        <option value="Airtel">Airtel</option>
+                        <option value="Vodafone">Vodafone</option>
+                        <option value="Tigo">Tigo</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Amount ($)</label>
+                    <input type="number" id="airtimeAmount" placeholder="0.00" min="0.01" step="0.01" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    <i class="fas fa-wifi"></i> Buy Airtime
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Receive Money Modal -->
+    <div id="receiveModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-download" style="color: #1565c0;"></i> Request Money</h2>
+                <button class="modal-close" onclick="closeModal('receiveModal')">&times;</button>
+            </div>
+            <div class="receive-info">
+                <p>Share this code with the sender:</p>
+                <div class="receive-code" id="receiveCode">123456</div>
+                <p style="font-size: 14px; color: var(--text-light);">Or share your phone number: <strong id="receivePhone">+1 234 567 890</strong></p>
+                <button onclick="copyReceiveCode()" class="btn btn-secondary" style="width: 100%; margin-top: 15px;">
+                    <i class="fas fa-copy"></i> Copy Code
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script src="js/mobile-money.js"></script>
+</body>
+</html>

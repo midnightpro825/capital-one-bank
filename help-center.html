@@ -1,0 +1,381 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help Center – Capital One</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --accent: #00E5FF;
+            --accent-glow: rgba(0, 229, 255, 0.3);
+            --dark: #0A0E1A;
+            --dark-card: #111827;
+            --text-primary: #FFFFFF;
+            --text-secondary: #94A3B8;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.08);
+        }
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+        .bg-grid {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            background-image: 
+                linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 229, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+        }
+        .bg-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            pointer-events: none;
+            opacity: 0.12;
+            z-index: 0;
+            animation: orbFloat 20s ease-in-out infinite alternate;
+        }
+        .bg-orb.orb1 {
+            width: 600px; height: 600px;
+            top: -20%; right: -10%;
+            background: radial-gradient(circle, rgba(0, 229, 255, 0.15) 0%, transparent 70%);
+        }
+        .bg-orb.orb2 {
+            width: 400px; height: 400px;
+            bottom: -10%; left: -10%;
+            background: radial-gradient(circle, rgba(124, 58, 237, 0.15) 0%, transparent 70%);
+            animation-delay: -7s;
+        }
+        @keyframes orbFloat {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(40px, -40px) scale(1.1); }
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--dark); }
+        ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; }
+
+        .navbar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1000;
+            padding: 12px 24px;
+            backdrop-filter: blur(20px);
+            background: rgba(10, 14, 26, 0.85);
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .navbar .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 22px;
+            font-weight: 700;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+        .navbar .logo .icon {
+            width: 36px; height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #00E5FF, #7C3AED);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: var(--dark);
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+        .navbar .logo span {
+            background: linear-gradient(135deg, #00E5FF, #7C3AED);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px; left: 0;
+            width: 0; height: 2px;
+            background: var(--accent);
+            transition: width 0.3s ease;
+        }
+        .nav-links a:hover { color: var(--text-primary); }
+        .nav-links a:hover::after { width: 100%; }
+        .nav-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+
+        .btn {
+            padding: 10px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #00E5FF, #7C3AED);
+            color: var(--dark);
+            box-shadow: 0 0 30px var(--accent-glow);
+        }
+        .btn-primary:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 0 50px var(--accent-glow); }
+        .btn-glass {
+            background: var(--glass-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--glass-border);
+        }
+        .btn-glass:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); }
+        .btn-sm { padding: 6px 14px; font-size: 12px; }
+
+        .page-header {
+            padding: 100px 24px 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+        .page-header h1 { font-size: 48px; font-weight: 700; margin-bottom: 12px; }
+        .page-header h1 span {
+            background: linear-gradient(135deg, #00E5FF, #7C3AED);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .page-header p { color: var(--text-secondary); font-size: 18px; max-width: 600px; margin: 0 auto; }
+
+        .content-section {
+            padding: 20px 24px 60px;
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+        .content-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 32px;
+            transition: all 0.3s ease;
+        }
+        .content-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(0, 229, 255, 0.2);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        .content-card .icon {
+            width: 64px; height: 64px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #00E5FF, #7C3AED);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin-bottom: 16px;
+            color: var(--dark);
+        }
+        .content-card h3 { font-size: 22px; font-weight: 600; margin-bottom: 8px; }
+        .content-card p { color: var(--text-secondary); font-size: 15px; line-height: 1.7; }
+        .content-card ul { list-style: none; margin: 12px 0; }
+        .content-card ul li {
+            padding: 6px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        .content-card ul li i { color: var(--accent); font-size: 12px; }
+
+        .footer {
+            padding: 48px 24px 24px;
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            border-top: 1px solid var(--glass-border);
+        }
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 32px;
+        }
+        .footer-brand .logo { font-size: 20px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+        .footer-brand p { color: var(--text-secondary); font-size: 14px; max-width: 300px; line-height: 1.7; }
+        .footer h4 { font-size: 14px; font-weight: 600; margin-bottom: 16px; }
+        .footer ul { list-style: none; }
+        .footer ul li { margin-bottom: 8px; }
+        .footer ul a { color: var(--text-secondary); text-decoration: none; font-size: 14px; transition: color 0.3s ease; }
+        .footer ul a:hover { color: var(--text-primary); }
+        .footer-bottom {
+            border-top: 1px solid var(--glass-border);
+            padding-top: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            color: var(--text-secondary);
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .footer-bottom .social { display: flex; gap: 16px; }
+        .footer-bottom .social a { color: var(--text-secondary); transition: color 0.3s ease; font-size: 18px; }
+        .footer-bottom .social a:hover { color: var(--text-primary); }
+
+        @media (max-width: 1024px) {
+            .content-grid { grid-template-columns: 1fr; }
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 768px) {
+            .navbar { padding: 10px 16px; flex-direction: column; align-items: stretch; }
+            .nav-links { justify-content: center; gap: 12px; }
+            .nav-actions { justify-content: center; }
+            .page-header h1 { font-size: 32px; }
+            .footer-grid { grid-template-columns: 1fr; }
+            .footer-bottom { flex-direction: column; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-grid"></div>
+    <div class="bg-orb orb1"></div>
+    <div class="bg-orb orb2"></div>
+
+    <nav class="navbar">
+        <a href="/" class="logo">
+            <div class="icon"><i class="fas fa-bolt"></i></div>
+            Capital<span>One</span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/products.html">Products</a></li>
+            <li><a href="/support.html">Support</a></li>
+            <li><a href="/company.html">Company</a></li>
+        </ul>
+        <div class="nav-actions">
+            <a href="/login.html" class="btn btn-glass btn-sm"><i class="fas fa-key"></i> Log in</a>
+            <a href="/login.html#register" class="btn btn-primary btn-sm"><i class="fas fa-user-plus"></i> Register</a>
+        </div>
+    </nav>
+
+    <div class="page-header">
+        <h1>Help Center <span></span></h1>
+        <p>Find answers to your questions and get help with your banking needs.</p>
+    </div>
+
+    <section class="content-section">
+        <div class="content-grid">
+            <div class="content-card">
+                <div class="icon"><i class="fas fa-life-ring"></i></div>
+                <h3>About Help Center</h3>
+                <p>Learn more about help center at Capital One.</p>
+                <ul>
+                    <li><i class="fas fa-check-circle"></i> Learn more</li>
+                    <li><i class="fas fa-check-circle"></i> Get started</li>
+                    <li><i class="fas fa-check-circle"></i> Contact us</li>
+                </ul>
+                <a href="/login.html#register" class="btn btn-primary btn-sm" style="margin-top:12px;"><i class="fas fa-arrow-right"></i> Get started</a>
+            </div>
+            <div class="content-card">
+                <div class="icon"><i class="fas fa-star"></i></div>
+                <h3>Why Capital One</h3>
+                <p>Discover why millions choose Capital One.</p>
+                <ul>
+                    <li><i class="fas fa-check-circle"></i> Trusted by millions</li>
+                    <li><i class="fas fa-check-circle"></i> AI-powered banking</li>
+                    <li><i class="fas fa-check-circle"></i> Secure & reliable</li>
+                </ul>
+                <a href="/login.html#register" class="btn btn-primary btn-sm" style="margin-top:12px;"><i class="fas fa-arrow-right"></i> Learn more</a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <div class="logo">
+                    <div class="icon" style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#00E5FF,#7C3AED);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--dark);"><i class="fas fa-bolt"></i></div>
+                    Capital<span>One</span>
+                </div>
+                <p>Redefining banking for the modern world. AI-powered, secure, and always on.</p>
+            </div>
+            <div>
+                <h4>Products</h4>
+                <ul>
+                    <li><a href="/current-accounts.html">Current Accounts</a></li>
+                    <li><a href="/savings.html">Savings</a></li>
+                    <li><a href="/loans.html">Loans</a></li>
+                    <li><a href="/credit-cards.html">Credit Cards</a></li>
+                    <li><a href="/investments.html">Investments</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="/help-center.html">Help Center</a></li>
+                    <li><a href="/security.html">Security</a></li>
+                    <li><a href="/privacy-policy.html">Privacy Policy</a></li>
+                    <li><a href="/terms.html">Terms of Service</a></li>
+                    <li><a href="/contact.html">Contact Us</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="/about.html">About</a></li>
+                    <li><a href="/careers.html">Careers</a></li>
+                    <li><a href="/press.html">Press</a></li>
+                    <li><a href="/blog.html">Blog</a></li>
+                    <li><a href="/investors.html">Investors</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>© 2026 Capital One. All rights reserved.</span>
+            <div class="social">
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-youtube"></i></a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
