@@ -11,13 +11,13 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const SECRET_KEY = process.env.SECRET_KEY || 'your-secret-key-here-2026';
 
-// ===== DATABASE SETUP =====
-// Use /data/banking.db on Render, local file otherwise
-const dbPath = process.env.RENDER ? '/data/banking.db' : './banking.db';
+// ===== DATABASE SETUP - FIXED FOR RENDER =====
+// Render's /tmp directory is writable
+const dbPath = process.env.RENDER ? '/tmp/banking.db' : './banking.db';
 console.log('📁 Database path:', dbPath);
 
-// Ensure directory exists on Render
-if (process.env.RENDER) {
+// Only create directory for local development
+if (!process.env.RENDER) {
     const dbDir = path.dirname(dbPath);
     if (!fs.existsSync(dbDir)) {
         fs.mkdirSync(dbDir, { recursive: true });
@@ -132,36 +132,6 @@ function createTables() {
 // Create tables on startup
 createTables();
 
-// ===== CREATE TEST USER IF NO USERS EXIST =====
-async function createTestUser() {
-    const count = await dbGet('SELECT COUNT(*) as count FROM users');
-    if (count.count === 0) {
-        console.log('👤 No users found. Creating test user...');
-        const hashedPassword = await bcrypt.hash('password123', 10);
-        const userId = uuidv4();
-        const createdAt = new Date().toISOString();
-        
-        await dbRun(`INSERT INTO users (id, name, email, phone, password, balance, pin, status, tier, loyaltyPoints, cashbackRate, dailyLimit, monthlyLimit, kycVerified, kycSubmitted, address, dob, gender, profilePicture, twoFactor, sessionTimeout, createdAt, lastLogin) 
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`, [
-            userId, 'Test User', 'test@example.com', '+1 234 567 890', hashedPassword,
-            5000.00, '1234', 'active', 'Silver', 1500,
-            0.02, 2000, 10000, 1, 1, '123 Test Street, New York, NY 10001',
-            '1990-01-01', 'male', null, 'disabled', 30, createdAt, createdAt
-        ]);
-        
-        // Create wallets
-        const providers = ['MTN', 'Airtel', 'Vodafone', 'Tigo'];
-        for (const provider of providers) {
-            await dbRun(`INSERT INTO mobile_wallets (walletId, userId, phoneNumber, provider, balance, currency, status, createdAt) 
-                VALUES (?,?,?,?,?,?,?,?)`, [
-                uuidv4(), userId, '+1 234 567 890', provider,
-                provider === 'MTN' ? 2500 : 500, 'USD', 'active', createdAt
-            ]);
-        }
-        console.log('✅ Test user created: test@example.com / password123');
-    }
-}
-
 // ===== HELPER FUNCTIONS =====
 function dbGet(sql, params = []) {
     return new Promise((resolve, reject) => {
@@ -196,16 +166,46 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(__dirname));
 
+// ===== CREATE TEST USER =====
+async function createTestUser() {
+    try {
+        const count = await dbGet('SELECT COUNT(*) as count FROM users');
+        if (count.count === 0) {
+            console.log('👤 Creating test user...');
+            const hashedPassword = await bcrypt.hash('password123', 10);
+            const userId = uuidv4();
+            const createdAt = new Date().toISOString();
+            
+            await dbRun(`INSERT INTO users (id, name, email, phone, password, balance, pin, status, tier, loyaltyPoints, cashbackRate, dailyLimit, monthlyLimit, kycVerified, kycSubmitted, address, dob, gender, profilePicture, twoFactor, sessionTimeout, createdAt, lastLogin) 
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`, [
+                userId, 'Test User', 'test@example.com', '+1 234 567 890', hashedPassword,
+                5000.00, '1234', 'active', 'Silver', 1500,
+                0.02, 2000, 10000, 1, 1, '123 Test Street, New York, NY 10001',
+                '1990-01-01', 'male', null, 'disabled', 30, createdAt, createdAt
+            ]);
+            
+            const providers = ['MTN', 'Airtel', 'Vodafone', 'Tigo'];
+            for (const provider of providers) {
+                await dbRun(`INSERT INTO mobile_wallets (walletId, userId, phoneNumber, provider, balance, currency, status, createdAt) 
+                    VALUES (?,?,?,?,?,?,?,?)`, [
+                    uuidv4(), userId, '+1 234 567 890', provider,
+                    provider === 'MTN' ? 2500 : 500, 'USD', 'active', createdAt
+                ]);
+            }
+            console.log('✅ Test user created: test@example.com / password123');
+        }
+    } catch (error) {
+        console.error('Error creating test user:', error);
+    }
+}
+
 // ============================================
 // USER AUTH ROUTES
 // ============================================
 
-// REGISTER
 app.post('/api/auth/register', async (req, res) => {
     try {
         const { name, email, phone, password, pin } = req.body;
-        
-        console.log('📝 Registration attempt:', { name, email });
         
         if (!name || !email || !phone || !password || !pin) {
             return res.status(400).json({ success: false, error: 'All fields are required' });
@@ -247,8 +247,6 @@ app.post('/api/auth/register', async (req, res) => {
         
         const token = jwt.sign({ id: userId, email: email }, SECRET_KEY, { expiresIn: '7d' });
         
-        console.log('✅ Registration successful for:', email);
-        
         res.status(201).json({
             success: true,
             message: 'Registration successful',
@@ -264,17 +262,14 @@ app.post('/api/auth/register', async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('❌ Registration error:', error);
+        console.error('Registration error:', error);
         res.status(500).json({ success: false, error: error.message });
     }
 });
 
-// LOGIN
 app.post('/api/auth/login', async (req, res) => {
     try {
         const { email, password } = req.body;
-        
-        console.log('🔑 Login attempt:', { email });
         
         if (!email || !password) {
             return res.status(400).json({ success: false, error: 'Email and password are required' });
@@ -282,21 +277,17 @@ app.post('/api/auth/login', async (req, res) => {
         
         const user = await dbGet('SELECT * FROM users WHERE email = ?', [email]);
         if (!user) {
-            console.log('❌ User not found:', email);
             return res.status(401).json({ success: false, error: 'Invalid credentials' });
         }
         
         const validPassword = await bcrypt.compare(password, user.password);
         if (!validPassword) {
-            console.log('❌ Invalid password for:', email);
             return res.status(401).json({ success: false, error: 'Invalid credentials' });
         }
         
         await dbRun('UPDATE users SET lastLogin = ? WHERE id = ?', [new Date().toISOString(), user.id]);
         
         const token = jwt.sign({ id: user.id, email: user.email }, SECRET_KEY, { expiresIn: '7d' });
-        
-        console.log('✅ Login successful for:', email);
         
         res.json({
             success: true,
@@ -313,24 +304,23 @@ app.post('/api/auth/login', async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('❌ Login error:', error);
+        console.error('Login error:', error);
         res.status(500).json({ success: false, error: error.message });
     }
 });
 
 // ============================================
-// ADMIN AUTH
+// ADMIN AUTHENTICATION
 // ============================================
+
 const ADMIN_EMAIL = 'admin@capitalone.com';
 const ADMIN_PASSWORD = 'Admin@2026';
 
 app.post('/api/admin/login', async (req, res) => {
     const { email, password } = req.body;
-    console.log('👑 Admin login attempt:', email);
     
     if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
         const token = jwt.sign({ role: 'admin', email: email }, SECRET_KEY, { expiresIn: '1d' });
-        console.log('✅ Admin login successful');
         return res.json({
             success: true,
             message: 'Admin login successful',
@@ -342,7 +332,6 @@ app.post('/api/admin/login', async (req, res) => {
             }
         });
     }
-    console.log('❌ Admin login failed');
     res.status(401).json({ 
         success: false,
         error: 'Invalid admin credentials'
@@ -371,33 +360,27 @@ function authenticateAdmin(req, res, next) {
 // ADMIN ROUTES
 // ============================================
 
-// GET ALL USERS
 app.get('/api/admin/users', authenticateAdmin, async (req, res) => {
     try {
-        console.log('📊 Admin fetching all users...');
         const users = await dbAll('SELECT id, name, email, phone, balance, status, tier, createdAt FROM users ORDER BY createdAt DESC');
-        console.log('✅ Found ' + users.length + ' users');
         res.json({
             success: true,
             users: users,
             total: users.length
         });
     } catch (error) {
-        console.error('❌ Error fetching users:', error);
+        console.error('Error fetching users:', error);
         res.status(500).json({ success: false, error: error.message });
     }
 });
 
-// GET ADMIN STATS
 app.get('/api/admin/stats', authenticateAdmin, async (req, res) => {
     try {
-        console.log('📊 Admin fetching stats...');
         const totalUsers = await dbGet('SELECT COUNT(*) as count FROM users');
         const activeUsers = await dbGet('SELECT COUNT(*) as count FROM users WHERE status = "active"');
         const totalBalance = await dbGet('SELECT SUM(balance) as total FROM users');
         const totalTransactions = await dbGet('SELECT COUNT(*) as count FROM transactions');
         
-        console.log('✅ Total Users: ' + (totalUsers?.count || 0));
         res.json({
             success: true,
             stats: {
@@ -408,16 +391,14 @@ app.get('/api/admin/stats', authenticateAdmin, async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('❌ Error fetching stats:', error);
+        console.error('Error fetching stats:', error);
         res.status(500).json({ success: false, error: error.message });
     }
 });
 
-// ADD FUNDS
 app.post('/api/admin/users/add-funds', authenticateAdmin, async (req, res) => {
     try {
-        const { userId, amount, provider, description } = req.body;
-        console.log('💰 Adding funds:', { userId, amount, provider });
+        const { userId, amount, provider } = req.body;
         
         if (!userId || !amount || amount <= 0) {
             return res.status(400).json({ success: false, error: 'Valid amount and user ID required' });
@@ -432,13 +413,10 @@ app.post('/api/admin/users/add-funds', authenticateAdmin, async (req, res) => {
         const newBalance = oldBalance + amount;
         
         await dbRun('UPDATE users SET balance = ? WHERE id = ?', [newBalance, userId]);
-        console.log('✅ Updated balance for ' + user.name + ' from $' + oldBalance + ' to $' + newBalance);
+        console.log(`✅ Updated balance for ${user.name} from $${oldBalance} to $${newBalance}`);
         
         if (provider) {
-            const wallet = await dbGet('SELECT * FROM mobile_wallets WHERE userId = ? AND provider = ?', [userId, provider]);
-            if (wallet) {
-                await dbRun('UPDATE mobile_wallets SET balance = balance + ? WHERE userId = ? AND provider = ?', [amount, userId, provider]);
-            }
+            await dbRun('UPDATE mobile_wallets SET balance = balance + ? WHERE userId = ? AND provider = ?', [amount, userId, provider]);
         }
         
         const updatedUser = await dbGet('SELECT id, name, email, phone, balance, status, tier FROM users WHERE id = ?', [userId]);
@@ -451,16 +429,14 @@ app.post('/api/admin/users/add-funds', authenticateAdmin, async (req, res) => {
             newBalance: newBalance
         });
     } catch (error) {
-        console.error('❌ Add funds error:', error);
+        console.error('Add funds error:', error);
         res.status(500).json({ success: false, error: error.message });
     }
 });
 
-// DEDUCT FUNDS
 app.post('/api/admin/users/deduct-funds', authenticateAdmin, async (req, res) => {
     try {
-        const { userId, amount, provider, description } = req.body;
-        console.log('💰 Deducting funds:', { userId, amount, provider });
+        const { userId, amount, provider } = req.body;
         
         if (!userId || !amount || amount <= 0) {
             return res.status(400).json({ success: false, error: 'Valid amount and user ID required' });
@@ -472,20 +448,17 @@ app.post('/api/admin/users/deduct-funds', authenticateAdmin, async (req, res) =>
         }
         
         if (user.balance < amount) {
-            return res.status(400).json({ success: false, error: 'Insufficient balance. User has $' + user.balance });
+            return res.status(400).json({ success: false, error: 'Insufficient balance' });
         }
         
         const oldBalance = user.balance;
         const newBalance = oldBalance - amount;
         
         await dbRun('UPDATE users SET balance = ? WHERE id = ?', [newBalance, userId]);
-        console.log('✅ Updated balance for ' + user.name + ' from $' + oldBalance + ' to $' + newBalance);
+        console.log(`✅ Updated balance for ${user.name} from $${oldBalance} to $${newBalance}`);
         
         if (provider) {
-            const wallet = await dbGet('SELECT * FROM mobile_wallets WHERE userId = ? AND provider = ?', [userId, provider]);
-            if (wallet && wallet.balance >= amount) {
-                await dbRun('UPDATE mobile_wallets SET balance = balance - ? WHERE userId = ? AND provider = ?', [amount, userId, provider]);
-            }
+            await dbRun('UPDATE mobile_wallets SET balance = balance - ? WHERE userId = ? AND provider = ?', [amount, userId, provider]);
         }
         
         const updatedUser = await dbGet('SELECT id, name, email, phone, balance, status, tier FROM users WHERE id = ?', [userId]);
@@ -498,25 +471,23 @@ app.post('/api/admin/users/deduct-funds', authenticateAdmin, async (req, res) =>
             newBalance: newBalance
         });
     } catch (error) {
-        console.error('❌ Deduct funds error:', error);
+        console.error('Deduct funds error:', error);
         res.status(500).json({ success: false, error: error.message });
     }
 });
 
 // ============================================
-// DASHBOARD
+// DASHBOARD ROUTE
 // ============================================
+
 app.get('/api/dashboard/:userId', async (req, res) => {
     try {
         const userId = req.params.userId;
-        console.log('📊 Dashboard requested for user:', userId);
         
         const user = await dbGet('SELECT * FROM users WHERE id = ?', [userId]);
         if (!user) {
             return res.status(404).json({ success: false, error: 'User not found' });
         }
-        
-        console.log('💰 User balance: $' + user.balance);
         
         const wallets = await dbAll('SELECT * FROM mobile_wallets WHERE userId = ?', [userId]);
         const transactions = await dbAll('SELECT * FROM transactions WHERE userId = ? ORDER BY timestamp DESC LIMIT 10', [userId]);
@@ -548,7 +519,7 @@ app.get('/api/dashboard/:userId', async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('❌ Dashboard error:', error);
+        console.error('Dashboard error:', error);
         res.status(500).json({ success: false, error: error.message });
     }
 });
@@ -556,6 +527,7 @@ app.get('/api/dashboard/:userId', async (req, res) => {
 // ============================================
 // TEST ROUTE
 // ============================================
+
 app.get('/api/test', (req, res) => {
     res.json({ 
         success: true,
@@ -567,6 +539,7 @@ app.get('/api/test', (req, res) => {
 // ============================================
 // SERVE HTML
 // ============================================
+
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'login.html'));
 });
@@ -588,13 +561,12 @@ app.get('/admin-dashboard.html', (req, res) => {
 });
 
 // ============================================
-// CREATE TEST USER ON STARTUP
-// ============================================
-createTestUser().catch(console.error);
-
-// ============================================
 // START SERVER
 // ============================================
+
+// Create test user after tables are ready
+createTestUser().catch(console.error);
+
 app.listen(PORT, () => {
     console.log('');
     console.log('========================================');
