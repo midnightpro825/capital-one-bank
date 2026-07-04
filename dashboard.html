@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -155,8 +155,21 @@
             box-shadow: 0 0 30px var(--accent-glow);
         }
         .btn-primary:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 0 50px var(--accent-glow); }
-        .btn-danger { background: #FF6B6B; color: var(--dark); }
+        .btn-success {
+            background: #00E5FF;
+            color: var(--dark);
+        }
+        .btn-success:hover { transform: translateY(-2px); box-shadow: 0 0 30px var(--accent-glow); }
+        .btn-danger {
+            background: #FF6B6B;
+            color: var(--dark);
+        }
         .btn-danger:hover { transform: translateY(-2px); box-shadow: 0 0 30px rgba(255,107,107,0.3); }
+        .btn-warning {
+            background: #FFA94D;
+            color: var(--dark);
+        }
+        .btn-warning:hover { transform: translateY(-2px); }
         .btn-sm { padding: 6px 14px; font-size: 12px; }
         .btn-block { width: 100%; justify-content: center; }
 
@@ -307,6 +320,10 @@
         .transaction-status.completed {
             background: rgba(0, 229, 255, 0.15);
             color: #00E5FF;
+        }
+        .transaction-status.pending {
+            background: rgba(255, 169, 77, 0.15);
+            color: #FFA94D;
         }
 
         .quick-actions-grid {
@@ -472,6 +489,7 @@
             outline: none;
             box-shadow: 0 0 20px var(--accent-glow);
         }
+        .form-group select option { background: var(--dark-card); color: white; }
 
         .toast {
             position: fixed;
@@ -550,7 +568,10 @@
                 <button class="btn btn-primary btn-sm" onclick="openModal('sendModal')">
                     <i class="fas fa-paper-plane"></i> Send
                 </button>
-                <button class="btn btn-glass btn-sm" onclick="openModal('airtimeModal')">
+                <button class="btn btn-success btn-sm" onclick="openModal('withdrawModal')">
+                    <i class="fas fa-arrow-down"></i> Withdraw
+                </button>
+                <button class="btn btn-warning btn-sm" onclick="openModal('airtimeModal')">
                     <i class="fas fa-wifi"></i> Airtime
                 </button>
                 <button class="btn btn-glass btn-sm" onclick="openModal('billModal')">
@@ -568,7 +589,7 @@
                         <i class="fas fa-wallet"></i>
                     </div>
                 </div>
-                <div class="stat-value" id="totalBalance">.00</div>
+                <div class="stat-value" id="totalBalance">$0.00</div>
                 <span class="stat-change positive">+12.5% this month</span>
             </div>
             <div class="stat-card">
@@ -578,7 +599,7 @@
                         <i class="fas fa-mobile-alt"></i>
                     </div>
                 </div>
-                <div class="stat-value" id="mobileBalance">.00</div>
+                <div class="stat-value" id="mobileBalance">$0.00</div>
                 <span class="stat-change positive">Active</span>
             </div>
             <div class="stat-card">
@@ -598,7 +619,7 @@
                         <i class="fas fa-piggy-bank"></i>
                     </div>
                 </div>
-                <div class="stat-value" id="savingsTotal">.00</div>
+                <div class="stat-value" id="savingsTotal">$0.00</div>
                 <span class="stat-change positive">On track</span>
             </div>
         </div>
@@ -658,6 +679,10 @@
                         <button onclick="openModal('requestModal')" class="quick-action-btn">
                             <i class="fas fa-download"></i>
                             <span>Request</span>
+                        </button>
+                        <button onclick="openModal('withdrawModal')" class="quick-action-btn">
+                            <i class="fas fa-arrow-down"></i>
+                            <span>Withdraw</span>
                         </button>
                         <button onclick="openModal('airtimeModal')" class="quick-action-btn">
                             <i class="fas fa-wifi"></i>
@@ -726,6 +751,15 @@
                     <input type="tel" id="sendPhone" placeholder="+1 234 567 890" required>
                 </div>
                 <div class="form-group">
+                    <label>Network</label>
+                    <select id="sendNetwork" required>
+                        <option value="MTN">MTN</option>
+                        <option value="Airtel">Airtel</option>
+                        <option value="Vodafone">Vodafone</option>
+                        <option value="Tigo">Tigo</option>
+                    </select>
+                </div>
+                <div class="form-group">
                     <label>Amount ($)</label>
                     <input type="number" id="sendAmount" placeholder="0.00" min="0.01" step="0.01" required>
                 </div>
@@ -771,6 +805,42 @@
         </div>
     </div>
 
+    <!-- Withdraw Modal -->
+    <div id="withdrawModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-arrow-down" style="color:#00E5FF;"></i> Withdraw Funds</h2>
+                <button class="modal-close" onclick="closeModal('withdrawModal')">&times;</button>
+            </div>
+            <form onsubmit="withdrawFunds(event)">
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" id="withdrawPhone" placeholder="+1 234 567 890" required>
+                </div>
+                <div class="form-group">
+                    <label>Network</label>
+                    <select id="withdrawNetwork" required>
+                        <option value="MTN">MTN</option>
+                        <option value="Airtel">Airtel</option>
+                        <option value="Vodafone">Vodafone</option>
+                        <option value="Tigo">Tigo</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Amount ($)</label>
+                    <input type="number" id="withdrawAmount" placeholder="0.00" min="0.01" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>PIN</label>
+                    <input type="password" id="withdrawPin" placeholder="4-digit PIN" maxlength="4" required>
+                </div>
+                <button type="submit" class="btn btn-success btn-block">
+                    <i class="fas fa-arrow-down"></i> Withdraw
+                </button>
+            </form>
+        </div>
+    </div>
+
     <!-- Airtime Modal -->
     <div id="airtimeModal" class="modal">
         <div class="modal-content">
@@ -796,7 +866,7 @@
                     <label>Amount ($)</label>
                     <input type="number" id="airtimeAmount" placeholder="0.00" min="0.01" step="0.01" required>
                 </div>
-                <button type="submit" class="btn btn-primary btn-block">
+                <button type="submit" class="btn btn-warning btn-block">
                     <i class="fas fa-wifi"></i> Buy
                 </button>
             </form>
@@ -929,7 +999,7 @@
                 </div>
                 <div style="background:var(--glass-bg);padding:12px;border-radius:10px;margin-bottom:16px;border:1px solid var(--glass-border);">
                     <p style="font-size:13px;color:var(--text-secondary);">Interest Rate: 10% APR</p>
-                    <p style="font-size:13px;color:var(--accent);" id="loanEstimate">Monthly: .00</p>
+                    <p style="font-size:13px;color:var(--accent);" id="loanEstimate">Monthly: $0.00</p>
                 </div>
                 <button type="submit" class="btn btn-primary btn-block">
                     <i class="fas fa-hand-holding-usd"></i> Apply
@@ -1047,7 +1117,7 @@
             var recent = transactions.slice(0, 5);
             for (var i = 0; i < recent.length; i++) {
                 var t = recent[i];
-                var isPositive = t.type === 'received' || t.type === 'deposit';
+                var isPositive = t.type === 'received' || t.type === 'deposit' || t.type === 'admin_deposit';
                 var icon = isPositive ? 'arrow-down' : 'arrow-up';
                 var iconColor = isPositive ? '#00E5FF' : '#FF6B6B';
                 var bgColor = isPositive ? 'rgba(0,229,255,0.15)' : 'rgba(255,107,107,0.15)';
@@ -1055,6 +1125,8 @@
                 var amount = (isPositive ? '+' : '-') + '$' + (t.amount || 0).toFixed(2);
                 var statusClass = t.status || 'completed';
                 var statusLabel = statusClass.charAt(0).toUpperCase() + statusClass.slice(1);
+                var desc = t.description || t.type || 'Transaction';
+                if (t.provider) desc += ' via ' + t.provider;
 
                 html += '<div class="transaction-item">' +
                     '<div class="transaction-left">' +
@@ -1062,7 +1134,7 @@
                             '<i class="fas fa-' + icon + '"></i>' +
                         '</div>' +
                         '<div class="transaction-info">' +
-                            '<p>' + (t.description || t.type || 'Transaction') + '</p>' +
+                            '<p>' + desc + '</p>' +
                             '<small>' + new Date(t.timestamp).toLocaleString() + '</small>' +
                         '</div>' +
                     '</div>' +
@@ -1178,40 +1250,260 @@
         // ===== SEND MONEY =====
         function sendMoney(event) {
             event.preventDefault();
-            showToast('Send money feature coming soon!', 'info');
-            closeModal('sendModal');
+            var phone = document.getElementById('sendPhone').value;
+            var network = document.getElementById('sendNetwork').value;
+            var amount = parseFloat(document.getElementById('sendAmount').value);
+            var description = document.getElementById('sendDescription').value;
+            var pin = document.getElementById('sendPin').value;
+
+            if (!phone || !amount || !pin) {
+                showToast('Please fill all required fields', 'error');
+                return;
+            }
+
+            if (!/^\d{4}$/.test(pin)) {
+                showToast('PIN must be 4 digits', 'error');
+                return;
+            }
+
+            // Call API to send money
+            fetch('/api/mobile/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                },
+                body: JSON.stringify({
+                    userId: currentUserId,
+                    receiverPhone: phone,
+                    receiverProvider: network,
+                    amount: amount,
+                    pin: pin,
+                    description: description || 'Money transfer'
+                })
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    showToast('✅ Money sent successfully via ' + network + '!', 'success');
+                    closeModal('sendModal');
+                    document.getElementById('sendModal').querySelector('form').reset();
+                    loadDashboard();
+                } else {
+                    showToast(data.error || 'Failed to send money', 'error');
+                }
+            })
+            .catch(function(error) {
+                showToast('Error sending money', 'error');
+            });
         }
 
+        // ===== REQUEST MONEY =====
         function requestMoney(event) {
             event.preventDefault();
-            showToast('Request money feature coming soon!', 'info');
-            closeModal('requestModal');
+            var phone = document.getElementById('requestPhone').value;
+            var amount = parseFloat(document.getElementById('requestAmount').value);
+            var description = document.getElementById('requestDescription').value;
+
+            if (!phone || !amount) {
+                showToast('Please fill all required fields', 'error');
+                return;
+            }
+
+            fetch('/api/mobile/request', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                },
+                body: JSON.stringify({
+                    userId: currentUserId,
+                    payerPhone: phone,
+                    amount: amount,
+                    description: description || 'Money request'
+                })
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    showToast('📨 Request sent to ' + phone + '!', 'success');
+                    closeModal('requestModal');
+                    document.getElementById('requestModal').querySelector('form').reset();
+                } else {
+                    showToast(data.error || 'Failed to request money', 'error');
+                }
+            })
+            .catch(function(error) {
+                showToast('Error requesting money', 'error');
+            });
         }
 
+        // ===== WITHDRAW FUNDS =====
+        function withdrawFunds(event) {
+            event.preventDefault();
+            var phone = document.getElementById('withdrawPhone').value;
+            var network = document.getElementById('withdrawNetwork').value;
+            var amount = parseFloat(document.getElementById('withdrawAmount').value);
+            var pin = document.getElementById('withdrawPin').value;
+
+            if (!phone || !amount || !pin) {
+                showToast('Please fill all required fields', 'error');
+                return;
+            }
+
+            if (!/^\d{4}$/.test(pin)) {
+                showToast('PIN must be 4 digits', 'error');
+                return;
+            }
+
+            // Withdraw is similar to send but with a different type
+            fetch('/api/mobile/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                },
+                body: JSON.stringify({
+                    userId: currentUserId,
+                    receiverPhone: phone,
+                    receiverProvider: network,
+                    amount: amount,
+                    pin: pin,
+                    description: 'Withdrawal to ' + network
+                })
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    showToast('✅ $' + amount.toFixed(2) + ' withdrawn to ' + network + ' successfully!', 'success');
+                    closeModal('withdrawModal');
+                    document.getElementById('withdrawModal').querySelector('form').reset();
+                    loadDashboard();
+                } else {
+                    showToast(data.error || 'Failed to withdraw', 'error');
+                }
+            })
+            .catch(function(error) {
+                showToast('Error withdrawing funds', 'error');
+            });
+        }
+
+        // ===== BUY AIRTIME =====
         function buyAirtime(event) {
             event.preventDefault();
-            showToast('Airtime purchase feature coming soon!', 'info');
-            closeModal('airtimeModal');
+            var phone = document.getElementById('airtimePhone').value;
+            var network = document.getElementById('airtimeNetwork').value;
+            var amount = parseFloat(document.getElementById('airtimeAmount').value);
+
+            if (!phone || !amount) {
+                showToast('Please fill all required fields', 'error');
+                return;
+            }
+
+            fetch('/api/mobile/airtime', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                },
+                body: JSON.stringify({
+                    userId: currentUserId,
+                    phoneNumber: phone,
+                    network: network,
+                    amount: amount
+                })
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    showToast('📶 $' + amount.toFixed(2) + ' airtime purchased on ' + network + '!', 'success');
+                    closeModal('airtimeModal');
+                    document.getElementById('airtimeModal').querySelector('form').reset();
+                    loadDashboard();
+                } else {
+                    showToast(data.error || 'Failed to buy airtime', 'error');
+                }
+            })
+            .catch(function(error) {
+                showToast('Error buying airtime', 'error');
+            });
         }
 
+        // ===== PAY BILL =====
         function payBill(event) {
             event.preventDefault();
-            showToast('Bill payment feature coming soon!', 'info');
-            closeModal('billModal');
+            var type = document.getElementById('billType').value;
+            var account = document.getElementById('billAccount').value;
+            var amount = parseFloat(document.getElementById('billAmount').value);
+
+            if (!account || !amount) {
+                showToast('Please fill all required fields', 'error');
+                return;
+            }
+
+            fetch('/api/mobile/paybill', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                },
+                body: JSON.stringify({
+                    userId: currentUserId,
+                    billType: type,
+                    accountNumber: account,
+                    amount: amount,
+                    provider: 'MTN'
+                })
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    showToast('💡 ' + type + ' bill paid successfully!', 'success');
+                    closeModal('billModal');
+                    document.getElementById('billModal').querySelector('form').reset();
+                    loadDashboard();
+                } else {
+                    showToast(data.error || 'Failed to pay bill', 'error');
+                }
+            })
+            .catch(function(error) {
+                showToast('Error paying bill', 'error');
+            });
         }
 
         // ===== GENERATE QR =====
         function generateQR() {
-            var code = 'QR-' + Math.random().toString(36).substr(2, 8).toUpperCase();
-            document.getElementById('qrCodeDisplay').textContent = code;
-            document.getElementById('qrDisplay').style.display = 'block';
-            showToast('QR Code generated!', 'success');
+            fetch('/api/mobile/qr/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                },
+                body: JSON.stringify({
+                    userId: currentUserId,
+                    amount: 0,
+                    description: 'Payment'
+                })
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    document.getElementById('qrCodeDisplay').textContent = data.qr.code;
+                    document.getElementById('qrDisplay').style.display = 'block';
+                    showToast('📱 QR Code generated!', 'success');
+                } else {
+                    showToast(data.error || 'Failed to generate QR', 'error');
+                }
+            })
+            .catch(function(error) {
+                showToast('Error generating QR', 'error');
+            });
         }
 
         function copyQR() {
             var code = document.getElementById('qrCodeDisplay').textContent;
             navigator.clipboard.writeText(code).then(function() {
-                showToast('QR Code copied!', 'success');
+                showToast('📋 QR Code copied!', 'success');
             }).catch(function() {
                 var textArea = document.createElement('textarea');
                 textArea.value = code;
@@ -1219,21 +1511,85 @@
                 textArea.select();
                 document.execCommand('copy');
                 document.body.removeChild(textArea);
-                showToast('QR Code copied!', 'success');
+                showToast('📋 QR Code copied!', 'success');
             });
         }
 
         function scanQR(event) {
             event.preventDefault();
-            showToast('QR scan feature coming soon!', 'info');
-            closeModal('qrModal');
+            var code = document.getElementById('qrCodeInput').value;
+            var amount = parseFloat(document.getElementById('qrAmount').value);
+
+            if (!code || !amount) {
+                showToast('Please fill all required fields', 'error');
+                return;
+            }
+
+            fetch('/api/mobile/qr/scan', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                },
+                body: JSON.stringify({
+                    userId: currentUserId,
+                    qrCode: code,
+                    amount: amount
+                })
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    showToast('✅ QR Payment successful!', 'success');
+                    closeModal('qrModal');
+                    loadDashboard();
+                } else {
+                    showToast(data.error || 'Failed to scan QR', 'error');
+                }
+            })
+            .catch(function(error) {
+                showToast('Error scanning QR', 'error');
+            });
         }
 
         // ===== SAVINGS =====
         function createSavings(event) {
             event.preventDefault();
-            showToast('Savings goal created!', 'success');
-            closeModal('savingsModal');
+            var goal = document.getElementById('savingsGoal').value;
+            var target = parseFloat(document.getElementById('savingsTarget').value);
+
+            if (!goal || !target) {
+                showToast('Please fill all required fields', 'error');
+                return;
+            }
+
+            fetch('/api/savings/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                },
+                body: JSON.stringify({
+                    userId: currentUserId,
+                    goal: goal,
+                    targetAmount: target,
+                    deadline: document.getElementById('savingsDeadline').value || null
+                })
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    showToast('🎯 Savings goal created!', 'success');
+                    closeModal('savingsModal');
+                    document.getElementById('savingsModal').querySelector('form').reset();
+                    loadDashboard();
+                } else {
+                    showToast(data.error || 'Failed to create savings goal', 'error');
+                }
+            })
+            .catch(function(error) {
+                showToast('Error creating savings goal', 'error');
+            });
         }
 
         function depositToSavings(savingsId) {
@@ -1244,14 +1600,72 @@
                 showToast('Amount must be greater than 0', 'error');
                 return;
             }
-            showToast('Deposit successful!', 'success');
+
+            fetch('/api/savings/deposit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                },
+                body: JSON.stringify({
+                    savingsId: savingsId,
+                    amount: depositAmount,
+                    provider: 'MTN'
+                })
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    showToast('💰 Deposit successful!', 'success');
+                    loadDashboard();
+                } else {
+                    showToast(data.error || 'Failed to deposit', 'error');
+                }
+            })
+            .catch(function(error) {
+                showToast('Error depositing to savings', 'error');
+            });
         }
 
         // ===== LOANS =====
         function applyLoan(event) {
             event.preventDefault();
-            showToast('Loan application submitted!', 'success');
-            closeModal('loanModal');
+            var amount = parseFloat(document.getElementById('loanAmount').value);
+            var purpose = document.getElementById('loanPurpose').value;
+            var duration = parseInt(document.getElementById('loanDuration').value);
+
+            if (!amount || !purpose) {
+                showToast('Please fill all required fields', 'error');
+                return;
+            }
+
+            fetch('/api/loans/apply', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                },
+                body: JSON.stringify({
+                    userId: currentUserId,
+                    amount: amount,
+                    purpose: purpose,
+                    duration: duration
+                })
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    showToast('💰 Loan approved! $' + amount.toFixed(2) + ' disbursed', 'success');
+                    closeModal('loanModal');
+                    document.getElementById('loanModal').querySelector('form').reset();
+                    loadDashboard();
+                } else {
+                    showToast(data.error || 'Failed to apply for loan', 'error');
+                }
+            })
+            .catch(function(error) {
+                showToast('Error applying for loan', 'error');
+            });
         }
 
         function repayLoan(loanId) {
@@ -1262,12 +1676,50 @@
                 showToast('Amount must be greater than 0', 'error');
                 return;
             }
-            showToast('Loan repayment successful!', 'success');
+
+            fetch('/api/loans/repay', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                },
+                body: JSON.stringify({
+                    loanId: loanId,
+                    amount: repayAmount,
+                    provider: 'MTN'
+                })
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    showToast('✅ Loan repayment successful!', 'success');
+                    loadDashboard();
+                } else {
+                    showToast(data.error || 'Failed to repay loan', 'error');
+                }
+            })
+            .catch(function(error) {
+                showToast('Error repaying loan', 'error');
+            });
         }
 
         // ===== NOTIFICATIONS =====
         function markAllRead() {
-            showToast('All notifications marked as read', 'success');
+            fetch('/api/notifications/read-all/' + currentUserId, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                }
+            })
+            .then(function(response) {
+                if (response.ok) {
+                    showToast('All notifications marked as read', 'success');
+                    loadDashboard();
+                }
+            })
+            .catch(function(error) {
+                showToast('Error marking notifications', 'error');
+            });
         }
 
         // ===== MODALS =====
@@ -1340,6 +1792,7 @@
         window.loadDashboard = loadDashboard;
         window.sendMoney = sendMoney;
         window.requestMoney = requestMoney;
+        window.withdrawFunds = withdrawFunds;
         window.buyAirtime = buyAirtime;
         window.payBill = payBill;
         window.generateQR = generateQR;
